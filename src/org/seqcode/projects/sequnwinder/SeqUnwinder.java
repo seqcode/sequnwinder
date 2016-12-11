@@ -23,15 +23,19 @@ public class SeqUnwinder {
 	public SeqUnwinderConfig getConfig(){return seqConfig;}
 	
 	public static void main(String[] args) throws Exception{
+		
+		System.err.println("SeqUnwinder version "+SeqUnwinderConfig.version+"\n\n");
 		SeqUnwinderConfig seqCon = new SeqUnwinderConfig(args);
 		SeqUnwinder sequnwinder = new SeqUnwinder(seqCon);
 		Outputwriter scribe = new Outputwriter(seqCon);
 		
 		// Now make arff file
+		System.err.println("Making Arff file..." );
 		MakeArff arffmaker = new MakeArff(sequnwinder.getConfig());
 		arffmaker.execute();
 		
 		// Now run the classifier
+		System.err.println("Training SeqUnwinder's core framework..." );
 		Classifier classifier = new Classifier(sequnwinder.getConfig().getKmin(),sequnwinder.getConfig().getNumK());
 		String classifierout = "";
 		try {
@@ -96,6 +100,7 @@ public class SeqUnwinder {
 		
 		scribe.writeClssifierOutput();
 		
+		System.err.println("Converting K-mer models into class-discriminative motifs ..." );
 
 		// Now run Discrim
 		Discrim discrim = new Discrim(sequnwinder.getConfig());
@@ -112,6 +117,8 @@ public class SeqUnwinder {
 		scribe.makeDiscrimJavaHeatmaps();
 		// Finally, make a html file for output
 		scribe.writeHTMLfile();
+		
+		System.err.println("Finished running SeqUnwinder...");
 		
 	}
 

@@ -134,7 +134,6 @@ public class HeatMapMaker extends AbstractPaintable {
 
 	@Override
 	public void paintItem(Graphics g, int x1, int y1, int x2, int y2) {
-		//motifs.replaceAll(new WMopr());
 		Graphics2D g2d = (Graphics2D)g;
 		// get the screen sizes
 		int screenSizeX = x2-x1;
@@ -210,63 +209,6 @@ public class HeatMapMaker extends AbstractPaintable {
 		drawExpColorBar(g2d,xPos-60,topBound+BoxHeight*(1+matrix.keySet().size()));
 
 	}
-
-
-
-	public class WMopr implements UnaryOperator<WeightMatrix>{
-
-		@Override
-		public WeightMatrix apply(WeightMatrix t) {
-			String s1 = WeightMatrix.getMaxLetters(t);
-			s1.replace(' ', 'N');
-			String s2 = WeightMatrix.getMaxLetters(WeightMatrix.reverseComplement(t));
-			s2.replace(' ', 'N');
-			int s1Ind = seq2int(s1);
-			int s2Ind = seq2int(s2);
-			return s1Ind <= s2Ind ? t : WeightMatrix.reverseComplement(t);
-		}
-
-	}
-
-	public  int base2int(char base) {
-		int intVal = -1;
-		switch (base) {
-		case 'A':
-			intVal = 0;
-			break;
-		case 'C':
-			intVal = 1;
-			break;
-		case 'G':
-			intVal = 2;
-			break;
-		case 'T':
-			intVal = 3;
-			break;
-		case 'N':
-			intVal = 4;
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid character: " + base);
-		}
-		return intVal;
-	}
-
-	public  int seq2int(String seq) {
-		int intVal = 0;
-		int len = seq.length();
-
-		for (int i = 0; i < len; i++) {
-			long currInt = base2int(seq.charAt(i));
-			if (currInt == -1) {
-				return -1;
-			}
-			intVal = intVal * 5;
-			intVal += currInt;
-		}
-		return intVal;
-	}
-
 
 	private Color expColor(double v){
 		Color c;

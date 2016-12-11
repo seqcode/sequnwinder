@@ -6,7 +6,11 @@ import org.seqcode.ml.clustering.Cluster;
 import org.seqcode.ml.clustering.ClusterRepresentative;
 
 
-
+/**
+ * KmerProfileAvgDistRep: Cluster representative of hills in K-mer space
+ * @author akshaykakumanu
+ * @version	%I%, %G%
+ */
 public class KmerProfileAvgDistRep implements ClusterRepresentative<int[]> {
 	
 	KmerProfileEucDistComparator comp;

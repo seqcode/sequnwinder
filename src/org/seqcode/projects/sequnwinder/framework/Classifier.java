@@ -15,7 +15,6 @@ import java.util.Vector;
 
 import org.seqcode.data.io.RegionFileUtilities;
 import org.seqcode.projects.sequnwinder.framework.LOne;
-import org.seqcode.projects.sequnwinder.framework.LTwo;
 import org.seqcode.projects.sequnwinder.framework.Optimizer;
 import org.seqcode.projects.sequnwinder.framework.Classifier.ClassRelationStructure.*;
 
@@ -29,7 +28,12 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.RemoveUseless;
 import weka.filters.unsupervised.attribute.ReplaceMissingValues;
-
+/**
+ * Classifier: Extends Weka's Abstract Classifier class to implements the core of SeqUnwinder's Multi-class structured
+ * classification framework. 
+ * @author akshaykakumanu
+ * @version	%I%, %G%
+ */
 
 public class Classifier extends AbstractClassifier implements OptionHandler, WeightedInstancesHandler, PMMLProducer{
 
@@ -419,9 +423,7 @@ public class Classifier extends AbstractClassifier implements OptionHandler, Wei
 
 		if(m_OptimizationType.equals("L1"))
 			opt = new LOne(x,sm_x,m_Data);
-		else
-			opt = new LTwo(x,sm_x,m_Data,b);
-
+		
 		opt.setRidge(m_Ridge);
 		if(opt instanceof LOne){
 			((LOne) opt).setADMMmaxItrs(m_ADMM_MaxIts);

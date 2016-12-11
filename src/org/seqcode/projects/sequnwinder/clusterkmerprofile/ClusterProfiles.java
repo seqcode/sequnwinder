@@ -27,6 +27,15 @@ import org.seqcode.ml.clustering.vectorcluster.Mean;
 import org.seqcode.ml.clustering.vectorcluster.VectorClusterElement;
 import org.tc33.jheatchart.HeatChart;
 
+
+/**
+ * ClusterProfiles: Takes a list of data-points (hills in this case) and removes low penetrance K-mers to generate a
+ *  sparse representation of hills in the k-mer space. Next, does a k-means clustering with Euclidean Distance metric.
+ * 
+ * @author akshaykakumanu
+ * @version	%I%, %G%
+ */
+
 public class ClusterProfiles {
 	private PairwiseElementMetric<VectorClusterElement> metric = new EuclideanDistance<VectorClusterElement>();
 	private int K;
@@ -40,7 +49,7 @@ public class ClusterProfiles {
 	private int maxK=5;
 
 	
-	// Minimum penetrance of a kmer in a cluster to be considered
+	// Minimum penetrance of a K-mer in a cluster to be considered
 	public final double minKmerProp_clus = 0.2;
 	public final double minKmerProp_global = 0.04;
 	

@@ -176,10 +176,20 @@ public class MakeArff {
 			else
 				subGroupWeights.put(s, subGroupWeights.get(s)+1);
 		}
+	
 		// Now get the sorted keys
 		MapKeyComparator<Double> comp_d = new MapKeyComparator<Double>(subGroupWeights);
 		List<String> groupWeightsKeyset = comp_d.getKeyList();
 		Collections.sort(groupWeightsKeyset, comp_d);
+		
+		// Notify the user if a subclass has fewer than "minSubClassSizeNotify" data instances. But do nothing about it.
+		for(int i=0; i<groupWeightsKeyset.size()-1; i++){
+			if(subGroupWeights.get(groupWeightsKeyset.get(i)) <  SeqUnwinderConfig.minSubClassSizeNotify){
+				System.err.println("	"+groupWeightsKeyset.get(i)+" has less than "+ Integer.toString(SeqUnwinderConfig.minSubClassSizeNotify)+" Sites. For better results merge these with other classes and re-run SeqUnwinder." );
+			}else{
+				break;
+			}
+		}
 		
 		for(int i=0; i<groupWeightsKeyset.size()-1; i++){
 			subGroupWeights.put(groupWeightsKeyset.get(i), 

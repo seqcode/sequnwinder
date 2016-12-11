@@ -14,6 +14,11 @@ import org.seqcode.projects.sequnwinder.framework.LBFGS.ExceptionWithIflag;
 
 import weka.core.Utils;
 
+/**
+ * LOne: Solves the L1 problem in SeqUnwinder's framework using ADMM. 
+ * @author akshaykakumanu
+ * @version	%I%, %G%
+ */
 public class LOne extends Optimizer {
 
 	/** The maximum number of allowed iterations for the ADMM algorithm */
@@ -69,6 +74,8 @@ public class LOne extends Optimizer {
 	protected int[] cls;
 
 	// Misc
+	/** Counter that keeps track of the cross-validations sets*/
+	public int currCVset=0; 
 
 	public void initUandZ(){
 		int dim = numPredictors+1;
@@ -107,11 +114,10 @@ public class LOne extends Optimizer {
 	}
 
 	public void execute() throws Exception{
-		System.err.println("Training SeqUnwinder model!!");
 		long SeqUnwinderStartTime = System.currentTimeMillis();
-		
+		System.err.println("	Cross Validation set: "+Integer.toString(currCVset+1)); // 1 tab
 		for(int it=0; it<NODES_maxItr; it++){
-			System.err.println("Iteration: "+ Integer.toString(it+1));
+			System.err.println("		Iteration: "+ Integer.toString(it+1)); // 2 tab
 			
 			double[] sm_x_old = new double[sm_x.length];
 
@@ -120,19 +126,23 @@ public class LOne extends Optimizer {
 			}
 
 			// First, run admm on leaf nodes
-			System.err.println("Updating sub-class feature weights using ADMM!!");
+			if(sm_Debug){
+				System.err.print("			Updating sub-class feature weights using ADMM "); // 3 tab
+			}
 			long admmStartTime = System.currentTimeMillis();
 			ADMMrunner admm = new ADMMrunner();
 			admm.execute();
 			long admmEndTime = System.currentTimeMillis();
 			long duration = admmEndTime - admmStartTime;
-			System.err.println("Finished updating sub-class feature weights!! "+"Time taken (mins): "+Double.toString(duration/(1000.0*60)));
-			
+			if(sm_Debug){
+				System.err.println("			Finished updating sub-class feature weights!! "+"Time taken (mins): "+Double.toString(duration/(1000.0*60))); // 3 tabs
+			}
 			
 			// Now update the internal nodes
 			updateInternalNodes();
-			System.err.println("Updated label feature weights!!");
-
+			if(sm_Debug){
+				System.err.println("			Updated label feature weights!!"); // 3 tabs
+			}
 			// Check Convergence
 			boolean converged = true;
 			for(Node n : classStructure.allNodes.values()){
@@ -142,9 +152,9 @@ public class LOne extends Optimizer {
 				}
 				diff = Math.sqrt(diff);
 				if(sm_Debug){
-					System.err.println("delta(label/sublcass-weights) for class with index: "+n.nodeIndex + " is: "+  diff);
+					System.err.println("			delta(label/sublcass-weights) for class with index: "+n.nodeIndex + " is: "+  diff); //3 tabs
 					double tmp = SeqUnwinderConfig.NODES_tol*getL2NormX(n.nodeIndex);
-					System.err.println("Target to reach for this node is: " + n.nodeIndex + " is "+ tmp);
+					System.err.println("			Target to reach for this node is: " + n.nodeIndex + " is "+ tmp); // 3 tabs
 				}
 				if( diff > SeqUnwinderConfig.NODES_tol*getL2NormX(n.nodeIndex)){
 					converged=false;
@@ -153,8 +163,9 @@ public class LOne extends Optimizer {
 			}
 
 			if(converged){
-				System.err.println();
-				System.err.println("SeqUnwinder has converged after "+Integer.toString(it+1)+" iterations !!");
+				if(sm_Debug){
+					System.err.println("		SeqUnwinder has converged after "+Integer.toString(it+1)+" iterations !!"); // 2 tab
+				}
 				break;
 			}
 
@@ -162,7 +173,7 @@ public class LOne extends Optimizer {
 		
 		long SeqUnwinderEndTime = System.currentTimeMillis();
 		long seqDuration =  SeqUnwinderEndTime - SeqUnwinderStartTime;
-		System.err.println("Finished training SeqUnwinder!! "+"Time taken (mins): "+Double.toString(seqDuration/(1000.0*60)));
+		System.err.println("	Finished training for cross validation set: "+Integer.toString(currCVset+1)+". Time taken (mins): "+Double.toString(seqDuration/(1000.0*60))); // 1 tab
 	}
 
 	// Slave methods
@@ -224,7 +235,11 @@ public class LOne extends Optimizer {
 		x=null;
 	}
 
-
+	/**
+	 * ADMMrunner: The runner class for ADMM.
+	 * @author akshaykakumanu
+	 * @version	%I%, %G%
+	 */
 	public class ADMMrunner {
 
 		// Threaded variables
@@ -564,16 +579,13 @@ public class LOne extends Optimizer {
 			}
 
 			while(ADMM_currItr_value.get() < ADMM_maxItr){
-				//if(sm_Debug)
-				System.err.print(". "+ ADMM_currItr_value.get() + " ."); // Comment out later
+				System.err.print(". "+ ADMM_currItr_value.get() + " ."); 
 
 
 				// Update pho 
 				if(ADMM_currItr_value.get() >0 && !ranADMM && ADMM_pho < SeqUnwinderConfig.ADMM_pho_max)
 					updatePhoAndFold(ADMM_currItr_value.get()-1);
-				//if(sm_Debug)
-				System.err.print(" "+ADMM_pho+" "); // Comment out later
-
+				
 				//make sure all of finished_linesrch[] are set to false before you begin the linesearch.
 				synchronized(finished_linesrch){
 					for(int i=0; i<finished_linesrch.length; i++){
@@ -581,9 +593,7 @@ public class LOne extends Optimizer {
 					}
 				}
 				
-				System.out.println(numberOfWaitingThreads.get());
 				// Notify all threads to begin line search
-				//while(!numberOfReleasedThreads.compareAndSet(ADMM_numThreads, 0)){
 				while(true){
 					if(numberOfWaitingThreads.compareAndSet(ADMM_numThreads, 0)){
 						synchronized(beginLineSearch){
@@ -593,8 +603,6 @@ public class LOne extends Optimizer {
 					}
 					
 				}
-				//}
-
 				
 				// Wait in the monitor area of finished_linesrch
 				synchronized(finished_linesrch){
@@ -614,26 +622,18 @@ public class LOne extends Optimizer {
 					ADMMconverged.set(hasADMMConverged(ADMM_currItr_value.get()-1));
 				}
 
-				// Print the primal and dual residuals
-				if(ADMM_currItr_value.get()>0){
-					if(sm_Debug && !ADMMconverged.get()){
-						//double primal = 0.0;
-						//double dual = 0.0;
-						//for(int i=0; i<(numNodes*numNodes); i++){
-							//primal += history_primal[ADMM_currItr_value.get()-1][i];
-							//dual += history_dual[ADMM_currItr_value.get()-1][i];
-						//}
-						//System.err.println("Primal residual "+ primal + " , Dual residual "+ dual);
-					}else{
+				// Check if ADMM has converged
+				if(ADMM_currItr_value.get()>0 && ADMMconverged.get()){
+					if(sm_Debug){
 						System.err.println();
-						System.err.println("ADMM has converged after "+ADMM_currItr_value.get()+" iterations !!");
-						// Notify all slave threads
-						synchronized(beginLineSearch){
-							beginLineSearch.notifyAll();
-						}
-						ranADMM=true;
-						break;
+						System.err.print("			ADMM has converged after "+ADMM_currItr_value.get()+" iterations !!"); // 3 tabs
 					}
+					// Notify all slave threads
+					synchronized(beginLineSearch){
+						beginLineSearch.notifyAll();
+					}
+					ranADMM=true;
+					break;
 				}
 
 				// Now update z
@@ -688,6 +688,8 @@ public class LOne extends Optimizer {
 				ADMM_currItr_value.incrementAndGet();
 
 			}
+			
+			System.err.println();
 
 			// Notify any waiting threads in beginLineSearch's monitor region
 			synchronized(beginLineSearch){
@@ -716,8 +718,9 @@ public class LOne extends Optimizer {
 				primal += history_primal[ADMM_currItr_value.get()-1][i];
 				dual += history_dual[ADMM_currItr_value.get()-1][i];
 			}
-			System.err.println("Primal residual "+ primal + " , Dual residual "+ dual);
-
+			if(sm_Debug){
+				System.err.println("			Primal residual "+ primal + " , Dual residual "+ dual); // 3 tabs
+			}
 			// Now copy the leaf node weights (i.e x) to sm_x
 			for(Node n: classStructure.leafs){
 				int nOffset = n.nodeIndex*dim;
@@ -730,7 +733,11 @@ public class LOne extends Optimizer {
 
 
 
-
+		/**
+		 * ADMMrun: ADMM thread.
+		 * @author akshaykakumanu
+		 * @version	%I%, %G%
+		 */
 
 		public class ADMMrun implements Runnable{
 
@@ -774,13 +781,10 @@ public class LOne extends Optimizer {
 
 			@Override
 			public void run() {
-
+				
 				while(true){
-					
 					// Go to the wait list of the monitor region for object beginLineSearch
 					// The current thread will wait until the main thread notifies
-					
-					
 					synchronized(beginLineSearch){
 						try {
 							numberOfWaitingThreads.incrementAndGet();
@@ -789,9 +793,6 @@ public class LOne extends Optimizer {
 							e.printStackTrace();
 						}
 					}
-					
-					//numberOfReleasedThreads.incrementAndGet();
-					System.out.println("Thread "+ threadName + " realeased!!"); // Comment out later
 					
 					if(ADMM_currItr_value.get() >= ADMM_maxItr)
 						break;
@@ -866,12 +867,6 @@ public class LOne extends Optimizer {
 						}
 					}
 
-					// This could be a weak link in the code. I'm assuming the other threads have initiated line search
-					// Which, they should. However, if a thread reaches this point too soon (which is highly unlikely)
-					// Then the other thread whouldn't have initiated line search
-					// Can't think of a good way to make this full proof at the moment.
-					//beginLineSearch.set(false); // Atomically set to false
-
 					synchronized(t_x){
 						for(int i=0; i<t_b_x.length; i++){
 							t_x.get(threadName)[i] = t_b_x[i];
@@ -894,11 +889,11 @@ public class LOne extends Optimizer {
 			public int getThreadId(){return Integer.parseInt(threadName.substring(6));}
 
 			/**
-			 * This class implements two things:-
+			 * OptObject: This class implements two things:-
 			 * It calculates the gradient for the x-update sub-problem. (The BGFS method will need this)
 			 * It calculates the overall objective function for the x-update subproblem. (The BGFS method will need this)
 			 * @author akshaykakumanu
-			 *
+			 * @version	%I%, %G%
 			 */
 			public class OptObject {
 
@@ -973,13 +968,6 @@ public class LOne extends Optimizer {
 							}
 						}
 					}	
-
-					if(sm_Debug){
-						//System.err.println(grad[20]);
-						//System.err.println(grad[dim+20]);
-						//System.err.println(grad[2*dim+20]);
-					}
-
 					return grad;
 				}
 
@@ -1029,11 +1017,6 @@ public class LOne extends Optimizer {
 							}
 						}
 					}
-
-					if(sm_Debug){
-						//System.err.println("Negative Log Likelihood: "+nll);
-					}
-
 					return nll;
 				}
 

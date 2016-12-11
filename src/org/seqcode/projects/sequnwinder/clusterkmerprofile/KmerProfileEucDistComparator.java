@@ -1,7 +1,12 @@
 package org.seqcode.projects.sequnwinder.clusterkmerprofile;
 
 import org.seqcode.ml.clustering.PairwiseElementMetric;
-
+/**
+ * KmerProfileEucDistComparator: Euclidean Distance calculator between two pairs of hills 
+ * is sparse k-mer space
+ * @author akshaykakumanu
+ * @version	%I%, %G%
+ */
 public class KmerProfileEucDistComparator implements PairwiseElementMetric<int[]> {
 
 	@Override

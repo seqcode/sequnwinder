@@ -71,11 +71,4 @@ public class ScoreMotif {
 		
 	}
 	
-	
-	
-	
-	public static void main(String[] args) throws IOException, ParseException {
-		
-	}
-
 }
