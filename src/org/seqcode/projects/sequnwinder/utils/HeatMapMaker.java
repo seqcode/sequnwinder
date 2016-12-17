@@ -76,7 +76,7 @@ public class HeatMapMaker extends AbstractPaintable {
 		colnames.addAll(cn);
 		rownames.addAll(rn);
 		numVals = colnames.size();
-		ScreenSizeY = rownames.size()*BoxHeight + 200;
+		ScreenSizeY = rownames.size()*BoxHeight + 250;
 		ScreenSizeX = colnames.size()*BoxWidth + 300;
 		
 		topBound = topBorder+50;
@@ -119,7 +119,7 @@ public class HeatMapMaker extends AbstractPaintable {
 		g2d.drawRect(x, y, colorbarWidth, colorbarHeight);
 		
 		//Legend
-		g2d.setFont(new Font("Ariel", Font.PLAIN, 12));
+		g2d.setFont(new Font("Ariel", Font.PLAIN, 25));
 		FontMetrics metrics = g2d.getFontMetrics();
 		int textY = y+colorbarHeight+ (metrics.getHeight());
 		g2d.drawString("0", x+(colorbarWidth/2)-(metrics.stringWidth("0")/2), textY);
@@ -127,9 +127,12 @@ public class HeatMapMaker extends AbstractPaintable {
 		g2d.drawString(String.format("%.1f",maxExp), x+colorbarWidth-(metrics.stringWidth(String.format(".1f",maxExp))/2), textY);
 		
 		//Title
-		g2d.setFont(new Font("Ariel", Font.ITALIC, 12));
+		g2d.setFont(new Font("Ariel", Font.PLAIN, 25));
 		metrics = g2d.getFontMetrics();
-		g2d.drawString("Model specific discriminative score", x+(colorbarWidth/2)-(metrics.stringWidth("Model specific discriminative score")/2), y- (metrics.getHeight())/2);
+		//g2d.drawString("Model specific discriminative score", x+(colorbarWidth/2)-(metrics.stringWidth("Model specific discriminative score")/2), y- (metrics.getHeight())/2);
+		g2d.drawString("Model specific", x+(colorbarWidth/2)-(metrics.stringWidth("Model specific")/2), y- (metrics.getHeight()));
+		g2d.drawString("discriminative score", x+(colorbarWidth/2)-(metrics.stringWidth("discriminative score")/2), y- (metrics.getHeight())/3);
+	
 	}
 
 	@Override
@@ -206,7 +209,7 @@ public class HeatMapMaker extends AbstractPaintable {
 			}
 		}
 		// draw the legend
-		drawExpColorBar(g2d,xPos-60,topBound+BoxHeight*(1+matrix.keySet().size()));
+		drawExpColorBar(g2d,xPos-60,topBound+BoxHeight*(2+matrix.keySet().size()));
 
 	}
 
