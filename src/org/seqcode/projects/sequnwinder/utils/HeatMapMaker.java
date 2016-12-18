@@ -31,6 +31,7 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.seqcode.data.motifdb.WeightMatrix;
 import org.seqcode.data.motifdb.WeightMatrixPainter;
 import org.seqcode.gseutils.ArgParser;
+import org.seqcode.gseutils.Args;
 import org.seqcode.motifs.FreqMatrixImport;
 import org.seqcode.viz.paintable.AbstractPaintable;
 import org.seqcode.viz.paintable.PaintableFrame;
@@ -52,7 +53,7 @@ public class HeatMapMaker extends AbstractPaintable {
 	private static int numVals =4;
 	private int BoxHeight=40, BoxWidth=40, colorbarWidth = 120, colorbarHeight=15;
 
-	private final double maxExp=0.4, midExp=0, minExp=-0.4;
+	private double maxExp=0.4, midExp=0, minExp=-0.4;
 
 	private Color expMaxColor = Color.yellow;
 	private Color expMidColor = Color.black;
@@ -70,10 +71,14 @@ public class HeatMapMaker extends AbstractPaintable {
 	
 	public int getImageWidth(){return ScreenSizeX;}
 	public int getImageHeight(){return ScreenSizeY;}
+	public void setMinExp(double m){minExp = m;}
+	public void setMaxExp(double m){maxExp = m;}
+	public void adjMidVal(){midExp = minExp+(maxExp - minExp)/2; }
+	
 	
 
 
-	public HeatMapMaker(Map<String,ArrayList<Double>> m, List<String> cn, List<String> rn) {
+	public HeatMapMaker(Map<String,ArrayList<Double>> m, List<String> cn, List<String> rn, boolean colScheme) {
 		matrix.putAll(m);
 		colnames.addAll(cn);
 		rownames.addAll(rn);
@@ -85,7 +90,7 @@ public class HeatMapMaker extends AbstractPaintable {
 		bottomBound = ScreenSizeY-bottomBorder;
 		leftBound = leftBorder;
 		rightBound = ScreenSizeX - rightBorder-200;
-		
+		singleColScheme = colScheme;
 		if(singleColScheme){
 			expMaxColor = Color.yellow;
 			expMinColor = Color.black;
@@ -280,8 +285,12 @@ public class HeatMapMaker extends AbstractPaintable {
 		}
 		br.close();
 		
-		HeatMapMaker runner = new HeatMapMaker(vals,cnames,rnames);
-		runner.setColorScheme(ap.hasKey("singleColScheme"));
+		HeatMapMaker runner = new HeatMapMaker(vals,cnames,rnames,ap.hasKey("singleColScheme"));
+		if(ap.hasKey("minVal"))
+			runner.setMinExp(Args.parseDouble(args, "minVal", -1));
+		if(ap.hasKey("maxVal"))
+			runner.setMaxExp(Args.parseDouble(args, "maxVal", 1));
+		runner.adjMidVal();
 		runner.loadMotifsFromFile(ap.getKeyValue("motifs"));
 		runner.setDrawMotiflabs(!ap.hasKey("nolabs"));
 		if(ap.hasKey("raster")){
