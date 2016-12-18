@@ -58,6 +58,8 @@ public class HeatMapMaker extends AbstractPaintable {
 	private Color expMidColor = Color.black;
 	private Color expMinColor = Color.blue;
 	
+	private boolean singleColScheme = false;
+	
 	private boolean drawMotiflabs = true;
 	
 	
@@ -84,9 +86,21 @@ public class HeatMapMaker extends AbstractPaintable {
 		leftBound = leftBorder;
 		rightBound = ScreenSizeX - rightBorder-200;
 		
+		if(singleColScheme){
+			expMaxColor = Color.yellow;
+			expMinColor = Color.black;
+			
+			int red = (int)(expMaxColor.getRed() * 0.5 + expMinColor.getRed() * 0.5);
+			int green = (int)(expMaxColor.getGreen() * 0.5 + expMinColor.getGreen() * 0.5);
+			int blue = (int)(expMaxColor.getBlue() *0.5 + expMinColor.getBlue() *0.5);
+			
+			expMidColor = new Color(red,green,blue);
+		}
+		
 	}
 	
 	public void setDrawMotiflabs(boolean b){drawMotiflabs = b;}
+	public void setColorScheme(boolean b){singleColScheme = b;}
 
 	// Load freq matrices
 	public void loadMotifsFromFile(String filename) throws NumberFormatException, IOException {
@@ -267,6 +281,7 @@ public class HeatMapMaker extends AbstractPaintable {
 		br.close();
 		
 		HeatMapMaker runner = new HeatMapMaker(vals,cnames,rnames);
+		runner.setColorScheme(ap.hasKey("singleColScheme"));
 		runner.loadMotifsFromFile(ap.getKeyValue("motifs"));
 		runner.setDrawMotiflabs(!ap.hasKey("nolabs"));
 		if(ap.hasKey("raster")){
