@@ -10,9 +10,9 @@ http://mahonylab.org/software/sequnwinder
 
 Dependencies:
 --------------
-..* SeqUnwinder requires Java 8+. To build SeqUnwinder, you will also need to download and build the seqcode-core library (https://github.com/seqcode/seqcode-core), and place the build and lib directories on your paths. 
-..* SeqUnwinder implements a multi-threaded version of ADMM to learn the model. Hence, when using large datasets (tens of thousands of genomic sites), it advisable to run in a system that allows multiprocessing.
-..* SeqUnwinder depends on [MEME](http://meme-suite.org/) (tested with MEME version 4.10.2).
+1. SeqUnwinder requires Java 8+. To build SeqUnwinder, you will also need to download and build the seqcode-core library (https://github.com/seqcode/seqcode-core), and place the build and lib directories on your paths. 
+2. SeqUnwinder implements a multi-threaded version of ADMM to learn the model. Hence, when using large datasets (tens of thousands of genomic sites), it advisable to run in a system that allows multiprocessing.
+3. SeqUnwinder depends on [MEME](http://meme-suite.org/) (tested with MEME version 4.10.2).
 
 Citation:
 --------------
