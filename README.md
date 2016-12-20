@@ -3,23 +3,26 @@
 SeqUnwinder is a framework for characterizing class-discriminative motifs in a collection of genomic loci that have several (overlapping) annotation labels.  
 
 
-## Download
+Downloading Executables
 --------------
 The following webpage will maintain executable JAR files for major versions: 
 http://mahonylab.org/software/sequnwinder
 
-### Dependencies:
+Building from Source
 --------------
-1. SeqUnwinder requires Java 8+. To build SeqUnwinder, you will also need to download and build the seqcode-core library (https://github.com/seqcode/seqcode-core), and place the build and lib directories on your paths. 
+If you want to build the code yourself, you will need to first download and build the seqcode-core library (https://github.com/seqcode/seqcode-core) and add its build/classes and lib directories to your CLASSPATH.
+
+Dependencies:
+--------------
+1. SeqUnwinder requires Java 8+. 
 2. SeqUnwinder implements a multi-threaded version of ADMM to train the model. Hence, when using large datasets (tens of thousands of genomic sites), it is advisable to run in a system that allows multiprocessing.
 3. SeqUnwinder depends on [MEME](http://meme-suite.org/) (tested with MEME version 4.10.2).
-4. if you want to build the code yourself, you will need to first download build the seqcode-core library (https://github.com/seqcode/seqcode-core) and add its build/classes and lib directories to your CLASSPATH.
 
-## Citation:
+Citation:
 --------------
 TBD
 
-## Running SeqUnwinder
+Running SeqUnwinder
 --------------
 On a typical dataset (~20,000 sites and ~8 annotation labels) SeqUnwinder takes a couple of hours to run.
 
@@ -64,9 +67,8 @@ Options (Required/important options are in __bold__.)
 
   * --minK \<value\>: Minimum length of *K*-mer to consider. Default = 4.
   * --maxK \<value\>: Maximim length of *K*-mer to consider. Default = 5.
-
       For most SeqUnwinder analysis described in (TBD), *K*-mers of lengths 4 and 5 showed optimal performace. However, with larger datsets (with more data instances for training), maxk can be increased to 6 or 7. 
-  * --R \<value\>: Regularization co-efficient in the model. For most SeqUnwinder applications, with on an average of ~20k genomic sites and ~6 labels and *K*-mers of 4 and 5, a value of 10.0 has been very effective. However, the optimal values changes with datasets. One might want to use a range of values and choose the one that performs best (in terms of test accuracy).
+  * --R \<value\>: Regularization co-efficient in the model. For most SeqUnwinder applications, with on an average of ~20k genomic sites and ~6 labels and *K*-mers of 4 and 5, a value of 10.0 has been very effective. However, the optimal value could change with datasets. One might want to use a range of values and choose the one that performs best (in terms of test accuracy).
   * --X <value>: Number of folds for cross validation. Default = 3.
   * --minScanLen \<value\>: Minimum length of the window to scan *K*-mer models. Default=8.
   * --maxScanLen \<value\>: Maximum length of the window to scan *K*-mer models. Default=14.
@@ -88,6 +90,10 @@ Options (Required/important options are in __bold__.)
   * --threads \<value\>: Number of threads to use. Default=4.
 
 
+Contact
+--------------
+
+For queries, please contact Akshay (auk262@psu.edu).
 
 Major History:
 --------------  
