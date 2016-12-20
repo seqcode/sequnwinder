@@ -25,6 +25,10 @@ On a typical dataset (~20,000 sites and ~8 annotation labels) SeqUnwinder takes 
 
 Running from a jar file:
 
+```{r, engine='sh', count_lines}
+java -Xmx20G -jar sequnwinder.jar <options - see below>
+```
+
 java -Xmx20G -jar sequnwinder.jar <options - see below>
 
 In the above, the “-Xmx20G” argument tells java to use up to 20GB of memory. If you have installed source code from github, and if all classes are in your CLASSPATH, you can run SeqUnwinder as follows:
