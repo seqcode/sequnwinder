@@ -57,9 +57,38 @@ Options (Required/important options are in __bold__.)
 	ATTGC....TTA	enhancer;shared
 	CGTAA....GGT	promoter;celltypeA
       ```
-  * --win \<integer value\>:  Size of the genomic regions in bp. Defaule = 150.
+  * --win \<integer value\>:  Size of the genomic regions in bp. Default = 150.
+  * --makerandregs: Flag to make random genomic regions as an extra outgroup class in classification.
 
 3. SeqUnwinder Model Options:
+
+  * --minK \<value\>: Minimum length of *K*-mer to consider. Default = 4.
+  * --maxK \<value\>: Maximim length of *K*-mer to consider. Default = 5.
+
+      For most SeqUnwinder analysis described in (TBD), *K*-mers of lengths 4 and 5 showed optimal performace. However, with larger datsets (with more data instances for training), maxk can be increased to 6 or 7. 
+  * --R \<value\>: Regularization co-efficient in the model. For most SeqUnwinder applications, with on an average of ~20k genomic sites and ~6 labels and *K*-mers of 4 and 5, a value of 10.0 has been very effective. However, the optimal values changes with datasets. One might want to use a range of values and choose the one that performs best (in terms of test accuracy).
+  * --X <value>: Number of folds for cross validation. Default = 3.
+  * --minScanLen \<value\>: Minimum length of the window to scan *K*-mer models. Default=8.
+  * --maxScanLen \<value\>: Maximum length of the window to scan *K*-mer models. Default=14.
+  * --hillsThresh \<value\>: Scoring threshold to identify hills. Default=0.1.
+  * --mememinw \<value\>: minw arg for MEME. Default=6.
+  * --mememaxw \<value\>: maxw arg for MEME. Default=13. This value should always be less than "maxScanLen".
+  * --memenmotifs \<value\>: Number of motifs MEME should find for each subclass/lable. Default=3.
+  * --memeSearchWin \<value\>: Window around hills to search for discriminative motifs. Default=16
+  * --memepath \<path\>: Path to the meme bin dir (default: meme in $PATH) 
+  * --numClusters \<value\>: Number of clusters to split k-mer hills using k-means. Default=3.
+   Following are some training parameters, which we higly recommend not to change.
+  * --PHO \<value\>: Augmented Lagrangian parameter for training using ADMM framework. Defaule=1.7.
+  * --A \<value\>: Maximum number of allowed ADMM iterations. Default=500.
+  * --S \<value\>: Maximum number of allowed SeqUnwinder iterations. Default=15.
+
+4. General Options
+
+  * --out \<String\>: Perfix for the output files.
+  * --threads \<value\>: Number of threads to use. Default=4.
+
+
+
 Major History:
 --------------  
 
