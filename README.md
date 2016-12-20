@@ -56,7 +56,7 @@ Options (Required/important options are in __bold__.)
 	GenSeqs file:
 	ATTGC....TTA	enhancer;shared
 	CGTAA....GGT	promoter;celltypeA
-```
+      ```
   * --win \<integer value\>:  Size of the genomic regions in bp. Defaule = 150.
 
 3. SeqUnwinder Model Options:
