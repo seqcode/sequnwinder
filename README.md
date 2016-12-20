@@ -48,7 +48,7 @@ Options (Required/important options are in __bold__.)
 2. Input Genomic Regions:
 
   * --__GenRegs__ \<Genomic regions with annotations filename\> OR --__GenSeqs__\<Sequences at Genomic points with annotations filename\> : A tab delimited file of a list of genomic points/sequences and corresponding annotations/labels. A simple example :
-   ```{r, engine='sh', count_lines}
+      ```{r, engine='sh', count_lines}
 	GenRegs file:
 	chr10:100076604	enhancer;shared
 	chr6:100316177	promoter;celltypeA
