@@ -33,11 +33,11 @@ java -Xmx20G org.seqcode.projects.sequnwinder.SeqUnwinder <options - see below>
 
 Options
 
-Required/important options are __underscored__.
+Required/important options are in __bold__.
 
-Specifying the genome:
+1. Specifying the genome:
 
---__geninfo__ \<genome info file\>:  This file should list the lengths of all chromosomes on separate lines using the format chrName<tab>chrLength. You can generate a suitable file from UCSC 2bit format genomes using the UCSC utility “twoBitInfo”. The chromosome names should be exactly the same as those used in your input list of genomic regions.
+..* --__geninfo__ \<genome info file\>:  This file should list the lengths of all chromosomes on separate lines using the format chrName<tab>chrLength. You can generate a suitable file from UCSC 2bit format genomes using the UCSC utility “twoBitInfo”. The chromosome names should be exactly the same as those used in your input list of genomic regions.
 
 The genome info files for some UCSC genome versions:
 
