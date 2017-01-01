@@ -20,7 +20,6 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.seqcode.data.io.RegionFileUtilities;
-import org.seqcode.data.io.StreamGobbler;
 import org.seqcode.data.motifdb.WeightMatrix;
 import org.seqcode.projects.sequnwinder.framework.SeqUnwinderConfig;
 
@@ -213,7 +212,7 @@ public class Outputwriter {
 		}
 		br.close();
 		
-		HeatMapMaker hmapMaker = new HeatMapMaker(vals,cnames,rnames);
+		HeatMapMaker hmapMaker = new HeatMapMaker(vals,cnames,rnames,false);
 		// get motifs
 		hmapMaker.loadMotifsFromFile(seqConfig.getOutDir().getAbsolutePath()+File.separator+"Discrim_motifs.transfac");
 		Image im = hmapMaker.getImage(hmapMaker.getImageWidth(),hmapMaker.getImageHeight());
@@ -244,54 +243,12 @@ public class Outputwriter {
 		}
 		br.close();
 
-		hmapMaker = new HeatMapMaker(vals,cnames,rnames);
+		hmapMaker = new HeatMapMaker(vals,cnames,rnames,false);
 		// get motifs
 		hmapMaker.loadMotifsFromFile(seqConfig.getOutDir().getAbsolutePath()+File.separator+"Discrim_motifs.transfac");
 		im = hmapMaker.getImage(HeatMapMaker.sImageWidth, HeatMapMaker.sImageHeight);
 		ImageIO.write((RenderedImage) im, "png", new File(seqConfig.getOutDir().getAbsolutePath()+"/Discrim_motifs_simple_heatmap.png"));
 
-	}
-	
-	public void makeDiscrimRHeatmaps() throws IOException, InterruptedException{
-		//First make the Rscript to plot heatmaps
-		File rScript = new File(seqConfig.getOutDir().getAbsolutePath()+File.separator+"plotHeatmap.R");
-		FileWriter fw = new FileWriter(rScript);
-		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write("library(gplots) \n");
-		bw.write("args <- commandArgs(TRUE) \n");
-		bw.write("data <- as.matrix(read.table(args[1], header=TRUE, sep = \"\t\", row.names = 1,as.is=TRUE)) \n");
-		bw.write("colors = c(seq(0,0.5,length=6),seq(0.51,1,length=6)) \n");
-		bw.write("my_palette <- colorRampPalette(c(\"lightblue\",\"red\"))(n = 11) \n");
-		bw.write("png(file=args[2],width=1000, height=1000, bg = \"transparent\") \n");
-		bw.write("heatmap.2(data,Rowv=FALSE,Colv=FALSE,breaks=colors,col=my_palette,symm=F,symkey=F,symbreaks=T,dendrogram=\"none\",trace=\"none\",margins=c(14,14),keysize = 0.65,density.info=c(\"none\"),cexRow=2,cexCol=2) \n");
-		bw.write("dev.off()");
-		bw.close();
-		
-		// Now run the R script
-		String Rscriptcmd = seqConfig.getRpath()+"Rscript ";
-		Process proc = Runtime.getRuntime().exec(Rscriptcmd+" "+seqConfig.getOutDir().getAbsolutePath()+"/plotHeatmap.R"+" "+seqConfig.getOutDir().getAbsolutePath()+"/Discrim_motifs.scores"+" "+seqConfig.getOutDir().getAbsolutePath()+"/Discrim_motifs_heatmap.png");
-		// any error message? 
-		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream(), "R_ERR", true); 
-		// any output? 
-		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream(), "R_OUT", true); 
-		// kick them off 
-		errorGobbler.start(); 
-		outputGobbler.start(); 
-		int exitVal = proc.waitFor(); 
-		System.err.println("R ExitValue: " + exitVal);
-		proc.destroy();
-		
-		proc = Runtime.getRuntime().exec(Rscriptcmd+" "+seqConfig.getOutDir().getAbsolutePath()+"/plotHeatmap.R"+" "+seqConfig.getOutDir().getAbsolutePath()+"/Discrim_motifs_simple.scores"+" "+seqConfig.getOutDir().getAbsolutePath()+"/Discrim_motifs_simple_heatmap.png");
-		// any error message? 
-		errorGobbler = new StreamGobbler(proc.getErrorStream(), "R_ERR", true); 
-		// any output? 
-		outputGobbler = new StreamGobbler(proc.getInputStream(), "R_OUT", true); 
-		// kick them off 
-		errorGobbler.start(); 
-		outputGobbler.start(); 
-		exitVal = proc.waitFor(); 
-		System.err.println("R ExitValue: " + exitVal);
-		proc.destroy();
 	}
 	
 	public void writeHTMLfile() throws IOException{

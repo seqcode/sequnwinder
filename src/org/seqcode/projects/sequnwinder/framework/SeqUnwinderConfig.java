@@ -58,7 +58,6 @@ public class SeqUnwinderConfig implements Serializable{
 	protected int win=150;
 	protected String outArffFileName="out.arff";
 	protected String designFileName="SeqUnwinder.design";
-	protected String Rpath="";
 	
 	// Peaks features
 	/** Peak annotations as given by the user; Enhancer;Shared*/
@@ -204,7 +203,7 @@ public class SeqUnwinderConfig implements Serializable{
 	public HashMap<String,double[]> getTrainSetStats(){return trainSetStats;}
 	public HashMap<String,double[]> getTestSetStats(){return testSetStats;}
 	public HashMap<String, double[]> getDiscrimMotsScore(){return discrimMotifScores;}
-	public String getRpath(){return Rpath;}
+
 
 	public SeqUnwinderConfig(String[] arguments) throws IOException {
 		// Loading general options
@@ -366,10 +365,6 @@ public class SeqUnwinderConfig implements Serializable{
 		maxM = Args.parseInteger(args, "maxScanLen", 10);
 		thresold_hills = Args.parseDouble(args, "hillsThresh", 0.1);
 		
-		// Get R path
-		Rpath = Args.parseString(args, "rpath", Rpath);
-		if(!Rpath.equals("") && !Rpath.endsWith("/")){ Rpath= Rpath+"/";}
-		
 
 	}
 
@@ -423,7 +418,6 @@ public class SeqUnwinderConfig implements Serializable{
 				"\t--memeargs <additional args for MEME (default=  -dna -mod zoops -revcomp -nostatus)>\n"+
 				"\t--memeSearchWin <window around hills to search for discriminative motifs (default=16)>\n"+
 				"\t--numClusters <number of clusters to split k-mer hills using k-means (default=3)>\n"+
-				"\t--Rpath <path to R bin dir (default=Rscript in $PATH)>\n"+
 				"\t--minScanLen <minimum length of the window to scan k-mer models (default=6)>\n"+
 				"\t--maxScanLen <maximum length of the window to scan k-mer models (default=10)>\n"+
 				"\t--hillsThresh <thresholding for detecting hills (default=0.1)>\n"+

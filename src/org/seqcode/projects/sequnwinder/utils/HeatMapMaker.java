@@ -176,7 +176,7 @@ public class HeatMapMaker extends AbstractPaintable {
 		for(int c=0; c<colnames.size(); c++){
 			AffineTransform oldtrans = g2d.getTransform();
 			AffineTransform newtrans = new AffineTransform();
-			newtrans.translate(xPos-(BoxWidth*numVals/2)+((c+1)*BoxWidth)+5,topBound-5);
+			newtrans.translate(xPos-(BoxWidth*numVals/2)+((c+1)*BoxWidth)-5,topBound-5);
 			newtrans.rotate(Math.toRadians(270));
 			g2d.setTransform(newtrans);
 			g2d.drawString(colnames.get(c), 0,0);
