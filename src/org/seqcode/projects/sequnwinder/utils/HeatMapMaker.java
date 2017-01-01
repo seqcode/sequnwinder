@@ -169,10 +169,23 @@ public class HeatMapMaker extends AbstractPaintable {
 		int xPos = (leftBound+rightBound)/2;
 		
 		// paint the column names
+		Font collabelFont = new Font("Arial",Font.PLAIN,colLabSize);
+		g2d.setFont(collabelFont);
+		g2d.setColor(Color.BLACK);
+		//Vert g2d.drawString(String.format("%d",j), xPos, topBound+(geneBoxHeight*(j-1))+(geneBoxHeight/2));
+		for(int c=0; c<colnames.size(); c++){
+			AffineTransform oldtrans = g2d.getTransform();
+			AffineTransform newtrans = new AffineTransform();
+			newtrans.translate(xPos-(BoxWidth*numVals/2)+(c*BoxWidth)+5,topBound-5);
+			newtrans.rotate(Math.toRadians(90));
+			g2d.setTransform(newtrans);
+			g2d.drawString(colnames.get(c), 0,0);
+			g2d.setTransform(oldtrans);
+		}
+		
 		//AffineTransform old = g2d.getTransform();
 		//g2d.rotate(-Math.toRadians(90));
-		//Font collabelFont = new Font("Arial",Font.PLAIN,colLabSize);
-		//g2d.setFont(collabelFont);
+		
 		//g2d.setColor(Color.BLACK);
 		//for(int c=0; c<colnames.size(); c++){
 		//	g2d.drawString(colnames.get(c),topBound-5,xPos-(BoxWidth*numVals/2)+(c*BoxWidth)+5);
