@@ -115,7 +115,7 @@ public class LOne extends Optimizer {
 
 	public void execute() throws Exception{
 		long SeqUnwinderStartTime = System.currentTimeMillis();
-		System.err.println("	Cross Validation set: "+Integer.toString(currCVset+1)); // 1 tab
+		System.err.println("	Cross Validation set: "+Integer.toString(currCVset++)); // 1 tab
 		for(int it=0; it<NODES_maxItr; it++){
 			System.err.println("		Iteration: "+ Integer.toString(it+1)); // 2 tab
 			
@@ -579,9 +579,10 @@ public class LOne extends Optimizer {
 			}
 
 			while(ADMM_currItr_value.get() < ADMM_maxItr){
-				System.err.print(". "+ ADMM_currItr_value.get() + " ."); 
+				if(sm_Debug)
+					System.err.print(". "+ ADMM_currItr_value.get() + " ."); 
 
-
+				
 				// Update pho 
 				if(ADMM_currItr_value.get() >0 && !ranADMM && ADMM_pho < SeqUnwinderConfig.ADMM_pho_max)
 					updatePhoAndFold(ADMM_currItr_value.get()-1);

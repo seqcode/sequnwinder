@@ -246,7 +246,7 @@ public class Outputwriter {
 		hmapMaker = new HeatMapMaker(vals,cnames,rnames,false);
 		// get motifs
 		hmapMaker.loadMotifsFromFile(seqConfig.getOutDir().getAbsolutePath()+File.separator+"Discrim_motifs.transfac");
-		im = hmapMaker.getImage(HeatMapMaker.sImageWidth, HeatMapMaker.sImageHeight);
+		im = hmapMaker.getImage(hmapMaker.getImageWidth(),hmapMaker.getImageHeight());
 		ImageIO.write((RenderedImage) im, "png", new File(seqConfig.getOutDir().getAbsolutePath()+"/Discrim_motifs_simple_heatmap.png"));
 
 	}
