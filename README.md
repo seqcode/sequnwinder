@@ -90,12 +90,12 @@ Options (Required/important options are in __bold__.)
 
   * --out \<String\>: Perfix for the output files.
   * --threads \<value\>: Number of threads to use. Default=4.
-
+  * --debug : Flag to run in debug mode.
 
 Contact
 --------------
 
-For queries, please contact Akshay (auk262@psu.edu).
+For queries, please contact Akshay (auk262@psu.edu) or Shaun Mahony (mahony@psu.edu).
 
 Major History:
 --------------  
