@@ -98,7 +98,7 @@ This example runs SeqUnwinder v0.1 on simulated dataset used in the SeqUnwinder 
 
 Command:
 ```{r, engine='sh', count_lines}
-java -Xmx20G -jar sequnwinder.jar ‒‒geninfo ~/genomes/mm9/mm9.info --seq ~/genomes/mm10/ --seqs simulateOverlap.fa --win 150 --minK 4 --maxK 5 --R 10 --PHO 1.7 --A 500 --S 15 --X 3 --out example --numClusters 2 --memepath ~/software/meme_4.10.2/bin --memenmotifs 3 --mememinw 6 --mememaxw 10 --minScanLen 10 --maxScanLen 15 --hillsThresh 0.1 --threads 5
+java -Xmx20G -jar sequnwinder.jar ‒‒geninfo ~/genomes/mm10/mm10.info --seq ~/genomes/mm10/ --seqs simulateOverlap.fa --win 150 --minK 4 --maxK 5 --R 10 --PHO 1.7 --A 500 --S 15 --X 3 --out example --numClusters 2 --memepath ~/software/meme_4.10.2/bin --memenmotifs 3 --mememinw 6 --mememaxw 10 --minScanLen 10 --maxScanLen 15 --hillsThresh 0.1 --threads 5
 ```
 
 Results can be found [here](http://lugh.bmb.psu.edu/software/sequnwinder/example/SeqUnwinder_results.html)
