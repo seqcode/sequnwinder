@@ -459,7 +459,9 @@ public class SeqUnwinderConfig implements Serializable{
 		public void setScreenRepeats(boolean s){screenRepeats=s;}
 
 		public RandRegionsGenerator(boolean screenReps, int num) {
-			repMask = new RepeatMaskedGenerator<Region>(gcon.getGenome());
+			if(screenReps){
+				repMask = new RepeatMaskedGenerator<Region>(gcon.getGenome());
+			}
 			setScreenRepeats(screenReps);
 			setNum(num);
 		}
