@@ -88,7 +88,7 @@ public class ScoreSites {
 			Pair<String,String> currSeq = stream.next();
 
 
-			String seq = currSeq.cdr();
+			String seq = currSeq.cdr().toUpperCase();
 			// Check if the sequence (seq) contains any N's if present ignore
 			// them
 			if (seq.contains("N"))
