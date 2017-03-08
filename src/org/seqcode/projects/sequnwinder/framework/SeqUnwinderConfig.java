@@ -76,6 +76,8 @@ public class SeqUnwinderConfig implements Serializable{
 	protected List<Region> randRegs = new ArrayList<Region>();
 	/** If a subclass has less that this number of instances; notify the user to merge with other subclasses */ 
 	public static final int minSubClassSizeNotify = 200;
+	/** A fasta file to score the seqs using the k-mer model */
+	protected String fastaFname;
 	
 	
 	// Classifier options
@@ -203,7 +205,7 @@ public class SeqUnwinderConfig implements Serializable{
 	public HashMap<String,double[]> getTrainSetStats(){return trainSetStats;}
 	public HashMap<String,double[]> getTestSetStats(){return testSetStats;}
 	public HashMap<String, double[]> getDiscrimMotsScore(){return discrimMotifScores;}
-
+	public String getFastaFname(){return fastaFname;}
 
 	public SeqUnwinderConfig(String[] arguments) throws IOException {
 		// Loading general options
@@ -227,7 +229,8 @@ public class SeqUnwinderConfig implements Serializable{
 		// Get outdir and outbase and make them; delete dirs that exist with the same
 		outbase = Args.parseString(args, "out", "seqUnwinder_out");
 		outdir = new File(outbase);
-		makeOutPutDirs();
+		if(!ap.hasKey("fasta"))
+			makeOutPutDirs();
 
 		// use the base to name the arff file
 		outArffFileName = outbase+".arff";
@@ -238,7 +241,7 @@ public class SeqUnwinderConfig implements Serializable{
 		}
 
 		// Load peaks and annotations
-		if(!ap.hasKey("peaks") && !ap.hasKey("seqs")){
+		if(!ap.hasKey("peaks") && !ap.hasKey("seqs") && !ap.hasKey("fasta")){
 			System.err.println("Please provide genomic locations with labels/annotations and try again !!");
 			SeqUnwinderConfig.getSeqUnwinderArgsList();
 			System.exit(1);
@@ -278,6 +281,8 @@ public class SeqUnwinderConfig implements Serializable{
 				}
 			}
 			br.close();
+		}else if(ap.hasKey("fasta")){
+			fastaFname = ap.getKeyValue("fasta");
 		}
 
 
