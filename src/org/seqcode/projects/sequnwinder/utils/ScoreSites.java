@@ -1,10 +1,8 @@
-package org.seqcode.projects.sequnwinder.framework;
+package org.seqcode.projects.sequnwinder.utils;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +12,7 @@ import org.seqcode.data.io.parsing.FASTAStream;
 import org.seqcode.genome.sequence.SequenceUtils;
 import org.seqcode.gseutils.ArgParser;
 import org.seqcode.gseutils.Pair;
+import org.seqcode.projects.sequnwinder.framework.SeqUnwinderConfig;
 
 public class ScoreSites {
 
@@ -52,13 +51,20 @@ public class ScoreSites {
 
 	public void execute(){
 		double[] prob = new double[classnames.size()], v = new double[classnames.size()];
-
+		StringBuilder header = new StringBuilder();
+		header.append("#Region");header.append("\t");
+		for(int i=0; i<classnames.size(); i++){
+			header.append(classnames.get(i));header.append("\t");
+		}
+		header.deleteCharAt(header.length()-1);
+		System.out.println(header.toString());
+		
 		for(int i=0; i<data.size(); i++){
 			StringBuilder sb = new StringBuilder();
 			sb.append(seqNames.get(i));sb.append("\t");
 			// Log-posterior before normalizing
 			for (int j = 0; j < classnames.size() ; j++) {
-				for (int k = 0; k <= seqConfig.getNumK()+1; k++) {
+				for (int k = 0; k < seqConfig.getNumK()+1; k++) {
 					v[j] += m_Par[k][j] * data.get(i)[k];
 				}
 			}
