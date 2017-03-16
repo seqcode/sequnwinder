@@ -28,7 +28,7 @@ import org.seqcode.gsebricks.verbs.location.ChromRegionIterator;
 import org.seqcode.gsebricks.verbs.location.RepeatMaskedGenerator;
 import org.seqcode.gseutils.ArgParser;
 import org.seqcode.gseutils.Args;
-import org.seqcode.gseutils.strings.StringUtils;
+import org.seqcode.gseutils.Pair;
 
 
 /**
@@ -261,7 +261,6 @@ public class SeqUnwinderConfig implements Serializable{
 			br.close();
 			
 			// Loading peaks
-			List<Point> peaks = new ArrayList<Point>();
 			peaks.addAll(RegionFileUtilities.loadPeaksFromPeakFile(gcon.getGenome(), peaksFile, -1));
 			
 			// Converting peaks to regions
@@ -285,6 +284,12 @@ public class SeqUnwinderConfig implements Serializable{
 			fastaFname = ap.getKeyValue("fasta");
 		}
 
+		//Check if any subclasses have less the minimum number of allowed training instances
+		if(ap.hasKey("mergeLow")){
+			mergeLowCountSubclasses();
+		}else{
+			removeLowCountSubclasses();
+		}
 
 		// Check id random regions are needed to be created 
 		if(ap.hasKey("makerandregs")){
@@ -370,10 +375,119 @@ public class SeqUnwinderConfig implements Serializable{
 		maxM = Args.parseInteger(args, "maxScanLen", 10);
 		thresold_hills = Args.parseDouble(args, "hillsThresh", 0.1);
 		
+		
+
+	}
+	
+	/**
+	 * Removes subclass regions that have a total of less than "minSubClassSizeNotify" train instances
+	 */
+	public void removeLowCountSubclasses(){
+		HashMap<String,Double> subclassCount = new HashMap<String,Double>();
+
+		for(String a : annotations){
+			if(subclassCount.containsKey(a)){
+				subclassCount.put(a, subclassCount.get(a)+1);
+			}else{
+				subclassCount.put(a, 1.0);
+			}
+		}
+
+		List<String> sgroupsToRemove = new ArrayList<String>();
+
+		for(String sname :  subclassCount.keySet()){
+			if(subclassCount.get(sname)<minSubClassSizeNotify){
+				System.err.println("Wrarning!! -->	"+sname+" has less than "+ Integer.toString(minSubClassSizeNotify)+
+						" sites. Removing this subgroup. Use mergeLow option to merge these sites." );
+				sgroupsToRemove.add(sname);
+			}
+		}
+		
+		//Now remove these annotations peaks,regions and seqs
+		for(String toRemove : sgroupsToRemove){
+			Iterator<String> a_itr = annotations.iterator();
+			Iterator<Point> p_itr = peaks.iterator();
+			Iterator<Region> r_itr = regions.iterator();
+			Iterator<String> s_itr = seqs.iterator();
+			
+			while(a_itr.hasNext()){
+				String currAnnotation = a_itr.next();
+				Point currPeak;
+				Region currReg;
+				String currSeq;
+				if(peaks.size()>0)
+					currPeak = p_itr.next();
+				if(regions.size()>0)
+					currReg = r_itr.next();
+				if(seqs.size()>0)
+					currSeq = s_itr.next();
+				if(currAnnotation.equals(toRemove)){
+					a_itr.remove();
+					if(peaks.size()>0)
+						p_itr.remove();
+					if(regions.size()>0)
+						r_itr.remove();
+					if(seqs.size()>0)
+						s_itr.remove();
+				}
+			}
+		}
 
 	}
 
-	
+	/**
+	 * Merges all subclass regions that have less than "minSubClassSizeNotify" train instances
+	 * This is how the merge happens:-
+	 * The regions (of the low number subclass) are randomly assigned to subclasses that atleast share one label in common.
+	 */
+	public void mergeLowCountSubclasses(){
+		HashMap<String,Double> subclassCount = new HashMap<String,Double>();
+		
+		for(String a : annotations){
+			if(subclassCount.containsKey(a)){
+				subclassCount.put(a, subclassCount.get(a)+1);
+			}else{
+				subclassCount.put(a, 1.0);
+			}
+		}
+		
+		HashMap<String,List<String>> mergeInds = new HashMap<String,List<String>>();
+		
+		for(String sname :  subclassCount.keySet()){
+			if(subclassCount.get(sname) < minSubClassSizeNotify){
+				System.err.println("Wrarning!! -->	"+sname+" has less than "+ Integer.toString(minSubClassSizeNotify)+
+						" sites. Merging this subgroup with other relevant subgroups." );
+				mergeInds.put(sname,new ArrayList<String>());
+				String[] tmpLabs = sname.split(";");
+				for(int tl =0; tl<tmpLabs.length; tl++){
+					for(String s : subclassCount.keySet()){
+						if(s.startsWith(tmpLabs[tl]+";") || s.endsWith(";"+tmpLabs[tl]) || s.contains(";"+tmpLabs[tl]+";") || s.equals(tmpLabs[tl])){
+							if(subclassCount.get(s)> minSubClassSizeNotify)
+								mergeInds.get(sname).add(s);
+						}
+					}
+				}
+
+			}
+		}
+		
+		// Now update annotations
+		if(mergeInds.size()>0){
+			Random rand = new Random();
+			for(String sname : mergeInds.keySet()){
+				if(mergeInds.get(sname).size()>0){
+					int maxRand = mergeInds.get(sname).size();
+					for(int s = 0; s< annotations.size(); s++){
+						if(sname.equals(annotations.get(s))){
+							int rind = rand.nextInt(maxRand);
+							annotations.set(s, mergeInds.get(sname).get(rind));
+						}
+					}
+				}
+			}
+		}
+		
+	}
 
 	public void makeOutPutDirs(){
 		//Test if output directory already exists. If it does,  recursively delete contents

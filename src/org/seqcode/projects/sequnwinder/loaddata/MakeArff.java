@@ -40,7 +40,7 @@ public class MakeArff {
 	//Setters
 	/**
 	 * This setter methods does four things :-
-	 * 1) Stores subgroup names in "subGroupNames". The format is "label1&label2"
+	 * 1) Stores subgroup names in "subGroupNames". The format is "label1#label2"
 	 * 2) Makes the design file for SeqUnwinder
 	 * 3) Appends random regions to peaks and regions and also subGroupNames
 	 * 4) Finally, calculates the weights for each subgroup instances.
@@ -70,6 +70,7 @@ public class MakeArff {
 			subGroupsAtPeaks.add(subgroup);
 		}
 		
+		// ############################################################################
 		// Now remove a label that has only one subgroup to it
 		HashMap<String,Integer> tmpLabMap = new HashMap<String,Integer>(); 
 		for(String sname : subGroupNames){
@@ -89,32 +90,60 @@ public class MakeArff {
 		}
 		tmpLabMap.clear();
 		
-		// Now, adjest the indexes of the labels
+		// Now, adjust the indices of the labels
 		int indLab=0;
 		for(String s : labelNames.keySet()){
 			labelNames.put(s, indLab+subGroupNames.size());
 			indLab++;
 		}
+		// ############################################################################
 		
+		// Now, if a subgroup has the same name as the label then do this:
+		// sname ==> snameOnLy#sname 
+		// change in "subGroupsAtPeaks" also
+		List<String> snamesToChange = new ArrayList<String>();
+		for(String sname : subGroupNames){
+			for(String l : labelNames.keySet()){
+				if(sname.equals(l)){
+					snamesToChange.add(sname);
+				}
+			}
+		}
+		
+		if(snamesToChange.size()>0){
+			for(String sToChange : snamesToChange){
+				String modified = sToChange.concat("OnLy#").concat(sToChange);
+				subGroupNames.remove(sToChange);
+				subGroupNames.add(modified);
+				for(int s=0; s< subGroupsAtPeaks.size(); s++){
+					if(subGroupsAtPeaks.get(s).equals(sToChange)){
+						subGroupsAtPeaks.set(s, modified);
+					}
+				}
+			}
+		}
+		
+		// ############################################################################
+		// Making design file
 		// Set the number of layers to the config file
 		if(labelNames.size() == 0){
 			seqConfig.setNumLayers(1);
 		}else{
 			seqConfig.setNumLayers(2);
 		}
-			
+
 		// Now make the design file
 		StringBuilder designBuilder = new StringBuilder();
 		//First get the header
 		designBuilder.append("#Index"+"\t"+
-							 "Name"+"\t"+
-							 "isSubGroup" +"\t"+
-							 "AssignedLabs" + "\t"+
-							 "AssignedSGs" + "\t"+
-							 "Layer"+"\n");
+				"Name"+"\t"+
+				"isSubGroup" +"\t"+
+				"AssignedLabs" + "\t"+
+				"AssignedSGs" + "\t"+
+				"Layer"+"\n");
 		// Now subgroups
 		int index = 0;
-		
+
 		for(String s : subGroupNames){
 			// Check if this subgroup has parents
 			boolean isRoot = true;
@@ -124,7 +153,7 @@ public class MakeArff {
 			}
 			if(labelNames.size() == 0)
 				isRoot = true;
-			
+
 			designBuilder.append(index);designBuilder.append("\t"); // subgroup id
 			designBuilder.append(s+"\t"); // subgroup 
 			designBuilder.append(1);designBuilder.append("\t"); // subgroup indicator
@@ -153,7 +182,7 @@ public class MakeArff {
 			designBuilder.append(s+"\t"); // label name
 			designBuilder.append(0);designBuilder.append("\t"); // subgroup indicator
 			designBuilder.append("-"+"\t"); // Assigned labels
-			
+
 			int subSind = 0;
 			for(String subS : subGroupNames){ 
 				if(subS.startsWith(s+"#") || subS.endsWith("#"+s) || subS.contains("#"+s+"#") || subS.equals(s)){
@@ -168,34 +197,29 @@ public class MakeArff {
 		}
 		designBuilder.deleteCharAt(designBuilder.length()-1);
 		design = designBuilder.toString();
-		
-		// Finally, find the weights for each subgroup
+
+		// ############################################################################
+
+		// Now, find the weights for each subgroup
 		for(String s : subGroupsAtPeaks){
 			if(!subGroupWeights.containsKey(s))
 				subGroupWeights.put(s, 1.0);
 			else
 				subGroupWeights.put(s, subGroupWeights.get(s)+1);
 		}
-	
+
 		// Now get the sorted keys
 		MapKeyComparator<Double> comp_d = new MapKeyComparator<Double>(subGroupWeights);
 		List<String> groupWeightsKeyset = comp_d.getKeyList();
 		Collections.sort(groupWeightsKeyset, comp_d);
-		
-		// Notify the user if a subclass has fewer than "minSubClassSizeNotify" data instances. But do nothing about it.
-		for(int i=0; i<groupWeightsKeyset.size()-1; i++){
-			if(subGroupWeights.get(groupWeightsKeyset.get(i)) <  SeqUnwinderConfig.minSubClassSizeNotify){
-				System.err.println("	"+groupWeightsKeyset.get(i)+" has less than "+ Integer.toString(SeqUnwinderConfig.minSubClassSizeNotify)+" Sites. For better results merge these with other classes and re-run SeqUnwinder." );
-			}else{
-				break;
-			}
-		}
-		
+
 		for(int i=0; i<groupWeightsKeyset.size()-1; i++){
 			subGroupWeights.put(groupWeightsKeyset.get(i), 
 					subGroupWeights.get(groupWeightsKeyset.get(groupWeightsKeyset.size()-1))/subGroupWeights.get(groupWeightsKeyset.get(i)));
 		}
 		subGroupWeights.put(groupWeightsKeyset.get(groupWeightsKeyset.size()-1), 1.0);
+		
+		// ############################################################################
 	}
 	//Gettors
 	
