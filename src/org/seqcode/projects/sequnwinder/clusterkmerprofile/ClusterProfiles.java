@@ -19,6 +19,7 @@ import java.util.Vector;
 import org.seqcode.data.io.RegionFileUtilities;
 import org.seqcode.ml.clustering.Cluster;
 import org.seqcode.ml.clustering.ClusterRepresentative;
+import org.seqcode.ml.clustering.DefaultCluster;
 import org.seqcode.ml.clustering.PairwiseElementMetric;
 import org.seqcode.ml.clustering.kmeans.KMeansClustering;
 import org.seqcode.ml.clustering.vectorcluster.DefaultVectorClusterElement;
@@ -47,10 +48,15 @@ public class ClusterProfiles {
 	private HashMap<Integer,Double> intToLogitScore;
 	private int minK=4;
 	private int maxK=5;
+	
+	private int numBootstraps = 50;
+	private double bsSizeFraction = 0.3;
+	private int minC = 2;
+	private int maxC = 5;
 
 	
 	// Minimum penetrance of a K-mer in a cluster to be considered
-	public final double minKmerProp_clus = 0.2;
+	//public final double minKmerProp_clus = 0.2;
 	public final double minKmerProp_global = 0.04;
 	
 	// Heatmap options
@@ -132,36 +138,20 @@ public class ClusterProfiles {
 	 * @throws IOException 
 	 */
 	public List<Integer> execute() throws IOException{
-		// Initialize
-		ClusterRepresentative<VectorClusterElement> crep = new Mean();
-		//Random starts
-		Random generator = new Random();
-		Vector<VectorClusterElement> starts = new Vector<VectorClusterElement>();
-		for(int s=0; s<K; s++){
-			boolean found = false;
-			while(!found){
-				int r = generator.nextInt(sparse_profiles.size());
-				if(!added(starts,sparse_profiles.get(r))){
-					starts.add(sparse_profiles.get(r));
-					found = true;
-				}
-			}
-				
+		for(int c = minC; c<=maxC; c++){
+			ArrayList<VectorClusterElement> currBS = generateBootStrapSample();
+			double currSH = getSilhouette(c,currBS);
+			StringBuilder sb = new StringBuilder();
+			sb.append(c);sb.append("\t");sb.append(currSH);
+			System.out.println(sb.toString());
 		}
 		
-		//Initialize clustering
-		KMeansClustering<VectorClusterElement> kmc = new KMeansClustering<VectorClusterElement>(metric, crep, starts);
-		kmc.setIterations(numClusItrs);
 		
-		Collection<Cluster<VectorClusterElement>> clusters = kmc.clusterElements(sparse_profiles,0.01);
-		Vector<VectorClusterElement> clustermeans = kmc.getClusterMeans();
+		
 		
 		//Print the clusters
-		List<Integer> clusAssignment = writeClusters(clustermeans);
-		//Plot the clusters
-		Mappable orderedClusters = reorderKmerProfileMaps(clusters);
-		//drawClusterHeatmap(orderedClusters);
-		printMatrix(orderedClusters);
+		List<Integer> clusAssignment = null;
+		//List<Integer> clusAssignment = writeClusters(clustermeans);
 		
 		return clusAssignment;
 	}
@@ -211,125 +201,46 @@ public class ClusterProfiles {
         }
         return minCluster;
 	}
+
 	
-	
-	private Mappable reorderKmerProfileMaps(Collection<Cluster<VectorClusterElement>> clus){
-		Mappable ret = null; 
-		
-		//Mappable features
-		double[][] matrix;
-		String[] rnames;
-		String[] cnames;
-		
-		// Which colums to retain while drawing the heatmap
-		boolean[] keepCol = new boolean[sparse_profiles.get(0).dimension()];
-		for(int i=0; i<keepCol.length; i++){
-			keepCol[i] = false;
+	private ArrayList<VectorClusterElement> generateBootStrapSample(){
+		ArrayList<VectorClusterElement> ret = new ArrayList<VectorClusterElement>();
+		Random rand = new Random();
+		int maxInd = sparse_profiles.size();
+		int count = 0;
+		while(count <(int)(bsSizeFraction*maxInd)){
+			ret.add(sparse_profiles.get(rand.nextInt(maxInd)));
+			count++;
 		}
-		
-		//Which clusters to these columns belong to...
-		ArrayList<Integer> colCluster = new ArrayList<Integer>();
-		for(int i=0; i<keepCol.length; i++){
-			colCluster.add(K+1);
-		}
-		
-		
-		int clusID=1;
-		for(Cluster<VectorClusterElement> c : clus){
-			for(int i=0; i<keepCol.length; i++){
-				double colPerc=0;
-				for(VectorClusterElement elems : c.getElements()){
-					if(elems.getValue(i) > 0){
-						colPerc++;
-					}
-				}
-				colPerc = colPerc/c.getElements().size();
-				if(colPerc > minKmerProp_clus){
-					keepCol[i] = true;
-					if(clusID < colCluster.get(i)){
-						colCluster.set(i, clusID);
-					}
-				}
-			}
-			clusID++;
-		}
-		
-		// Now reorder 
-		ArrayIndexComparator comp = new ArrayIndexComparator(colCluster);
-		Integer[] indexes = comp.createIndexArray();
-		Arrays.sort(indexes, comp);
-		
-		int sparseLenght = 0;
-		for(int i=0;i<indexes.length; i++){
-			if(keepCol[indexes[i]])
-				sparseLenght++;
-			else
-				break;
-		}
-		
-		matrix = new double[sparse_profiles.size()][sparseLenght];
-		rnames = new String[sparse_profiles.size()];
-		cnames = new String[sparseLenght];
-		
-		//fill the cnames
-		for(int j=0; j<sparseLenght; j++){
-			cnames[j] = sparse_colnames.get(indexes[j]);
-		}
-		
-		int rowInd = 0;
-		for(Cluster<VectorClusterElement> c : clus){
-			for(VectorClusterElement elems : c.getElements()){
-				for(int j=0; j<sparseLenght; j++){
-					matrix[rowInd][j] = elems.getValue(indexes[j]);
-				}
-				rnames[rowInd] = indToLocation.get(rowInd);
-				rowInd++;
-			}
-		}
-		
-		ret = new Mappable(matrix, rnames, cnames);
 		return ret;
 	}
 	
-	private void printMatrix(Mappable mat) throws IOException{
-		StringBuilder sb = new StringBuilder();
-		sb.append("Region"+"\t");
-		for(int c=0; c<mat.colnames.length; c++){
-			sb.append(mat.colnames[c]+"\t");
-		}
-		sb.deleteCharAt(sb.length()-1);sb.append("\n");
-		for(int r=0; r<mat.rownmanes.length; r++){
-			sb.append(mat.rownmanes[r]+"\t");
-			for(int c=0; c<mat.colnames.length;c++){
-				sb.append(mat.matrix[r][c]);sb.append("\t");
+	private double getSilhouette(int nC, ArrayList<VectorClusterElement> data){
+		// Initialize
+		ClusterRepresentative<VectorClusterElement> crep = new Mean();
+		//Random starts
+		Random generator = new Random();
+		Vector<VectorClusterElement> starts = new Vector<VectorClusterElement>();
+		for(int s=0; s<nC; s++){
+			boolean found = false;
+			while(!found){
+				int r = generator.nextInt(data.size());
+				if(!added(starts,data.get(r))){
+					starts.add(data.get(r));
+					found = true;
+				}
 			}
-			sb.deleteCharAt(sb.length()-1);sb.append("\n");
+
 		}
-		
-		File matout = new File(outdir.getAbsoluteFile()+File.separator+"K-mer.mat");
-		FileWriter ow = new FileWriter(matout);
-		BufferedWriter bw = new BufferedWriter(ow);
-		bw.write(sb.toString());
-		bw.close();
-		
+
+		//Initialize clustering
+		KMeansClustering<VectorClusterElement> kmc = new KMeansClustering<VectorClusterElement>(metric, crep, starts);
+		kmc.setIterations(nC);
+		kmc.clusterElements(data,0.01);
+		return kmc.silhouette();
 		
 	}
-	
-	public void drawClusterHeatmap(Mappable plotMat) throws IOException{
-		double[][] matrix = plotMat.matrix;
-		HeatChart map = new HeatChart(matrix);
-		map.setHighValueColour(new Color(10));
-		map.setLowValueColour(new Color(20));
-		map.setChartMargin(100);
-		map.setAxisLabelsFont(new Font("Ariel",Font.PLAIN,55));
-		map.setXValues(plotMat.rownmanes);
-		map.setYValues(plotMat.colnames);
-		File f = new File(outdir.getAbsoluteFile()+File.separator+"Clusters.png");
-		map.saveToFile(f);
-	}
-	
-	
-	
+
 	/**
 	 * Constructor that sets up the k-means object
 	 * @param itrs
@@ -350,37 +261,5 @@ public class ClusterProfiles {
 		
 	}
 	
-	public class Mappable{
-		public double[][] matrix;
-		public String[] rownmanes;
-		public String[] colnames;
-		public Mappable(double[][] m, String[] rnames, String[] cnames) {
-			matrix = m;
-			rownmanes = rnames;
-			colnames = cnames;
-		}
-	}
-	
-	public class ArrayIndexComparator implements Comparator<Integer>{
-		ArrayList<Integer> list;
-		
-		public ArrayIndexComparator(ArrayList<Integer> ls) {
-			list = ls;
-		}
-		
-		public Integer[] createIndexArray(){
-			Integer[] indexes = new Integer[list.size()];
-			for(int i=0; i<indexes.length; i++){
-				indexes[i] = i;
-			}
-			return indexes;
-		}
-
-		@Override
-		public int compare(Integer o1, Integer o2) {
-			return list.get(o1).compareTo(list.get(o2));
-		}
-		
-	}
 
 }

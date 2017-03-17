@@ -34,11 +34,6 @@ public class SeqUnwinder {
 		MakeArff arffmaker = new MakeArff(sequnwinder.getConfig());
 		arffmaker.execute();
 		
-		//Debug line
-		System.exit(1);
-		// end
-		
-		
 		// Now run the classifier
 		System.err.println("Training SeqUnwinder's core framework..." );
 		Classifier classifier = new Classifier(sequnwinder.getConfig().getKmin(),sequnwinder.getConfig().getNumK());

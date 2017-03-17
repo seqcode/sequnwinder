@@ -224,6 +224,27 @@ public class HillsAnalysisSandbox {
 
 	}
 	
+	public void printClusterSilhouettes(String modName, File outdir) throws IOException{
+		// First generate profiles at the hills
+		ArrayList<int[]> profiles = new ArrayList<int[]>(); 
+		profiles.addAll(getProfilesAtHills(hills));
+		List<Double> scores = new ArrayList<Double>();
+		scores.addAll(scoreHills(modName));
+		HashMap<Integer,String> profileIndices = new HashMap<Integer,String>();
+		HashMap<Integer,Double> profileScore = new HashMap<Integer,Double>();
+		int ind = 0;
+		for(Region r: hills){
+			profileIndices.put(ind, r.getLocationString());
+			profileScore.put(ind, scores.get(ind));
+			ind++;
+		}
+
+		List<Integer> clusterAssignment = new ArrayList<Integer>();
+		ClusterProfiles clusterManager = new ClusterProfiles(numClusterItrs,numClusters,profiles,profileIndices,Kmin,Kmax,profileScore,outdir);
+		clusterManager.execute();
+
+	}
+	
 	
 	// 
 	public void printClustersAndMotifs(String modName, File outdir) throws IOException{
@@ -573,7 +594,10 @@ public class HillsAnalysisSandbox {
 			System.err.println("Which modelname to scan? Please provide and re-run");
 			System.exit(1);
 		}
-			
+		
+		if(ap.hasKey("printClusterSilhouettes")){
+			runner.printClusterSilhouettes(ap.getKeyValue("modname"), new File("out"));
+		}	
 		if(ap.hasKey("scoreHills"))
 			runner.printHillScores(modName);
 		if(ap.hasKey("printCGhills"))

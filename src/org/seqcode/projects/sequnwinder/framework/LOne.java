@@ -145,21 +145,48 @@ public class LOne extends Optimizer {
 			}
 			// Check Convergence
 			boolean converged = true;
+			
+			Double[] deltas = new Double[classStructure.allNodes.values().size()];
+			Double[] targets = new Double[classStructure.allNodes.values().size()];
+			
 			for(Node n : classStructure.allNodes.values()){
 				double diff = 0.0;
 				for(int w=0; w<(numPredictors+1); w++){
 					diff += Math.pow(sm_x_old[n.nodeIndex*(numPredictors+1)+w]-sm_x[n.nodeIndex*(numPredictors+1)+w],2);
 				}
 				diff = Math.sqrt(diff);
+				deltas[n.nodeIndex] = diff;
 				if(sm_Debug){
 					System.err.println("			delta(label/sublcass-weights) for class with index: "+n.nodeIndex + " is: "+  diff); //3 tabs
 					double tmp = SeqUnwinderConfig.NODES_tol*getL2NormX(n.nodeIndex);
 					System.err.println("			Target to reach for this node is: " + n.nodeIndex + " is "+ tmp); // 3 tabs
 				}
-				if( diff > SeqUnwinderConfig.NODES_tol*getL2NormX(n.nodeIndex)){
-					converged=false;
-					break;
+				targets[n.nodeIndex] = SeqUnwinderConfig.NODES_tol*getL2NormX(n.nodeIndex);
+			}
+			
+			int numPass = 0;
+			int numPass_relaxed = 0;
+			for(int p=0; p< deltas.length; p++){
+				if(deltas[p] < targets[p])
+					numPass++;
+				if(deltas[p] < targets[p]*2/SeqUnwinderConfig.NODES_tol)
+					numPass_relaxed++;
+			}
+			
+			if(numPass == deltas.length){
+				converged = true;
+			}else if(numPass_relaxed == deltas.length && it > NODES_maxItr/2){
+				converged = true;
+			}
+			
+			if(sm_Debug){
+				StringBuilder tmpErr = new StringBuilder();
+				tmpErr.append("\n");
+				for(int p=0; p< deltas.length; p++){
+					tmpErr.append(classStructure.allNodes.get(p).nodeName);tmpErr.append("\t");
+					tmpErr.append(deltas[p]);tmpErr.append("\t");tmpErr.append(targets[p]);tmpErr.append("\n");
 				}
+				System.err.println(tmpErr.toString()); // 3 tabs
 			}
 
 			if(converged){
