@@ -1,32 +1,33 @@
 package org.seqcode.projects.sequnwinder.clusterkmerprofile;
 
-import java.awt.Color;
-import java.awt.Font;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+
 import java.util.Collections;
-import java.util.Comparator;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+
 import org.seqcode.data.io.RegionFileUtilities;
-import org.seqcode.ml.clustering.Cluster;
+import org.seqcode.gseutils.Pair;
+
 import org.seqcode.ml.clustering.ClusterRepresentative;
-import org.seqcode.ml.clustering.DefaultCluster;
+
 import org.seqcode.ml.clustering.PairwiseElementMetric;
 import org.seqcode.ml.clustering.kmeans.KMeansClustering;
 import org.seqcode.ml.clustering.vectorcluster.DefaultVectorClusterElement;
 import org.seqcode.ml.clustering.vectorcluster.EuclideanDistance;
 import org.seqcode.ml.clustering.vectorcluster.Mean;
 import org.seqcode.ml.clustering.vectorcluster.VectorClusterElement;
-import org.tc33.jheatchart.HeatChart;
+
 
 
 /**
@@ -50,20 +51,15 @@ public class ClusterProfiles {
 	private int maxK=5;
 	
 	private int numBootstraps = 50;
-	private double bsSizeFraction = 0.3;
+	private double bsSizeFraction = 0.1;
 	private int minC = 2;
-	private int maxC = 5;
+	private int maxC = 10;
 
 	
 	// Minimum penetrance of a K-mer in a cluster to be considered
-	//public final double minKmerProp_clus = 0.2;
 	public final double minKmerProp_global = 0.04;
 	
-	// Heatmap options
-	public final int W_MARGIN=80;
-	public final int H_MARGIN=60;
-	public final int W=800;
-	public final int H=800;
+
 	
 	//Gettors
 	public int getKmerBaseInd(int len){
@@ -85,6 +81,10 @@ public class ClusterProfiles {
 		String kmerName = RegionFileUtilities.int2seq(ind- getKmerBaseInd(currKmerLen), currKmerLen);
 		
 		return kmerName;
+	}
+	
+	public int getNumClusters(){
+		return K;
 	}
 	
 	//Settors
@@ -138,20 +138,65 @@ public class ClusterProfiles {
 	 * @throws IOException 
 	 */
 	public List<Integer> execute() throws IOException{
+		StringBuilder sb = new StringBuilder();
+		double[][] sh = new double[maxC-minC+1][numBootstraps];
+		double[][] ssd = new double[maxC-minC+1][numBootstraps];
 		for(int c = minC; c<=maxC; c++){
-			ArrayList<VectorClusterElement> currBS = generateBootStrapSample();
-			double currSH = getSilhouette(c,currBS);
-			StringBuilder sb = new StringBuilder();
-			sb.append(c);sb.append("\t");sb.append(currSH);
-			System.out.println(sb.toString());
+			for(int b=0; b<numBootstraps; b++){
+				ArrayList<VectorClusterElement> currBS = generateBootStrapSample();
+				Pair<Pair<Double,Double>,Vector<VectorClusterElement>> currOut = doClustering(c, currBS);
+				double currSH = currOut.car().car();
+				double currSSD = currOut.car().cdr();
+				sh[c-minC][b] = currSH;
+				ssd[c-minC][b] = currSSD;
+				sb.append(c);sb.append("\t");sb.append(currSH);sb.append("\t");sb.append("Silhouette");sb.append("\n");
+				sb.append(c);sb.append("\t");sb.append(currSSD);sb.append("\t");sb.append("SSD");sb.append("\n");
+			}
 		}
 		
+		BufferedWriter bwQual = new BufferedWriter(new FileWriter(outdir.getAbsolutePath()+File.separator+"ClusterQuality.tab"));
+		bwQual.write(sb.toString());
+		bwQual.close();
+
+		double[] mediansSh = new double[maxC-minC+1];
+		for(int c=0; c<sh.length; c++){
+			Arrays.sort(sh[c]);
+			int middle = ((numBootstraps) / 2);
+			if(numBootstraps % 2 == 0){
+				double medianA = sh[c][middle];
+				double medianB = sh[c][middle-1];
+				mediansSh[c] = (medianA + medianB) / 2;
+			} else{
+				mediansSh[c] = sh[c][middle];
+			}
+		}
 		
+		double maxMedian = Double.MIN_VALUE;
+		int bestC = 0;
 		
+		for(int c=0; c<mediansSh.length; c++){
+			if(mediansSh[c]>maxMedian){
+				maxMedian = mediansSh[c];
+				bestC = c+minC;
+			}
+		}
 		
-		//Print the clusters
-		List<Integer> clusAssignment = null;
-		//List<Integer> clusAssignment = writeClusters(clustermeans);
+		K= bestC;
+		
+		Vector<VectorClusterElement>  bestCmeans = null;
+		double bestSilhouette = Double.MIN_VALUE;
+		
+		for(int b=0; b<numBootstraps; b++){
+			Pair<Pair<Double,Double>,Vector<VectorClusterElement>> currOut = doClustering(bestC, sparse_profiles);
+			double currSH = currOut.car().car();
+			if(currSH>bestSilhouette){
+				bestSilhouette = currSH;
+				bestCmeans = currOut.cdr();
+			}
+			
+		}
+		
+		List<Integer> clusAssignment = writeClusters(bestCmeans);
 		
 		return clusAssignment;
 	}
@@ -215,7 +260,13 @@ public class ClusterProfiles {
 		return ret;
 	}
 	
-	private double getSilhouette(int nC, ArrayList<VectorClusterElement> data){
+	/**
+	 * 
+	 * @param nC
+	 * @param data
+	 * @return Pair<Pair<silhouette,ssd>,clustermeans>>
+	 */
+	private Pair<Pair<Double,Double>,Vector<VectorClusterElement>> doClustering(int nC, ArrayList<VectorClusterElement> data){
 		// Initialize
 		ClusterRepresentative<VectorClusterElement> crep = new Mean();
 		//Random starts
@@ -235,11 +286,14 @@ public class ClusterProfiles {
 
 		//Initialize clustering
 		KMeansClustering<VectorClusterElement> kmc = new KMeansClustering<VectorClusterElement>(metric, crep, starts);
-		kmc.setIterations(nC);
+		kmc.setIterations(numClusItrs);
 		kmc.clusterElements(data,0.01);
-		return kmc.silhouette();
+		Pair<Double,Double> clusterquality = new Pair<Double,Double>(kmc.silhouette(),kmc.sumOfSquaredDistance());
+		
+		return new Pair<Pair<Double,Double>,Vector<VectorClusterElement>>(clusterquality,kmc.getClusterMeans());
 		
 	}
+	
 
 	/**
 	 * Constructor that sets up the k-means object

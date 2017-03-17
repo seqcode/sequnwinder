@@ -276,7 +276,7 @@ public class HillsAnalysisSandbox {
 		// Now do meme search on each clusters separately
 		String memeargs = getMemeArgs();
 		MemeER meme = new MemeER(MEMEpath, memeargs);
-		for(int c=0; c<numClusters; c++){ // Over each cluster
+		for(int c=0; c<clusterManager.getNumClusters(); c++){ // Over each cluster
 			System.err.println("Loading sequences for meme analysis : "+modName+ "Cluster"+c);
 			int numHillsLoaded = 0;
 			List<String> seqs = new ArrayList<String>();
