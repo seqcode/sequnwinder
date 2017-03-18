@@ -256,7 +256,7 @@ public class Discrim {
 			fillHills();
 			System.err.println("No of hills for K-mer model "+kmerModelName+" are :"+(seqConfig.getRegions().size() > 0 ? posHills.size() : posHillsSeqs.size()));
 			if(posHills.size() > 100 || posHillsSeqs.size() > 100){
-				ClusterProfiles clusterManager = new ClusterProfiles(SeqUnwinderConfig.ITRS_CLUS,seqConfig.getNumDiscrimClusters(),profiles,posHillsToIndex,seqConfig.getKmin(),seqConfig.getKmax(),posHillScores,basedir_profiles);
+				ClusterProfiles clusterManager = new ClusterProfiles(SeqUnwinderConfig.ITRS_CLUS,seqConfig.getNumDiscrimClusters(),profiles,posHillsToIndex,seqConfig.getKmin(),seqConfig.getKmax(),posHillScores,basedir_profiles,seqConfig.getKmerWeights().get(kmerModelName));
 				clusterAssignment = clusterManager.execute();
 			}
 		}

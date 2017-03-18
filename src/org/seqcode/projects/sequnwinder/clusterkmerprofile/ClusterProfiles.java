@@ -50,14 +50,15 @@ public class ClusterProfiles {
 	private int minK=4;
 	private int maxK=5;
 	
-	private int numBootstraps = 50;
-	private double bsSizeFraction = 0.1;
-	private int minC = 2;
-	private int maxC = 10;
-
+	private double[] modelWeights;
 	
 	// Minimum penetrance of a K-mer in a cluster to be considered
 	public final double minKmerProp_global = 0.04;
+	public final double minKmerWeight = 0.01;
+	private int numBootstraps = 50;
+	private final double bsSizeFraction = 0.1;
+	private final int minC = 2;
+	private final int maxC = 10;
 	
 
 	
@@ -107,18 +108,28 @@ public class ClusterProfiles {
 			}
 		}
 		
+		
+		//remove this later
+		StringBuilder sb = new StringBuilder();
+		
 		// Find the colnames of the once that will be kept and store the colnames in a list
 		for(int i=0; i<feature_penetrance.length; i++){
 			feature_penetrance[i] = feature_penetrance[i]/pfs.size();
-			if(feature_penetrance[i] > minKmerProp_global){
+			if(feature_penetrance[i] > minKmerProp_global && modelWeights[i]>minKmerWeight){
+				sb.append(getKmerName(i));sb.append("\t");sb.append(feature_penetrance[i]);sb.append("\n");
 				sparse_colnames.add(getKmerName(i));
 			}
 		}
-
+		
+		System.err.println(sb.toString());
+		//System.exit(1);
+			
 		// Now make the sparse profiles
 		int sparce_length = sparse_colnames.size();
 		//System.err.println(sparce_length);
 
+		
+		
 		for(int[] p : pfs){
 			double[] sparce_p = new double[sparce_length];
 			int count=0;
@@ -141,7 +152,10 @@ public class ClusterProfiles {
 		StringBuilder sb = new StringBuilder();
 		double[][] sh = new double[maxC-minC+1][numBootstraps];
 		double[][] ssd = new double[maxC-minC+1][numBootstraps];
+		HashMap<Integer,Vector<VectorClusterElement>> bestClusterMeans = new HashMap<Integer,Vector<VectorClusterElement>>();
 		for(int c = minC; c<=maxC; c++){
+			double bestSh = Double.MIN_VALUE;
+			Vector<VectorClusterElement> bestMeans = null;
 			for(int b=0; b<numBootstraps; b++){
 				ArrayList<VectorClusterElement> currBS = generateBootStrapSample();
 				Pair<Pair<Double,Double>,Vector<VectorClusterElement>> currOut = doClustering(c, currBS);
@@ -151,7 +165,12 @@ public class ClusterProfiles {
 				ssd[c-minC][b] = currSSD;
 				sb.append(c);sb.append("\t");sb.append(currSH);sb.append("\t");sb.append("Silhouette");sb.append("\n");
 				sb.append(c);sb.append("\t");sb.append(currSSD);sb.append("\t");sb.append("SSD");sb.append("\n");
+				if(bestSh < currSH){
+					bestSh = currSH;
+					bestMeans = currOut.cdr();
+				}
 			}
+			bestClusterMeans.put(c, bestMeans);                            
 		}
 		
 		BufferedWriter bwQual = new BufferedWriter(new FileWriter(outdir.getAbsolutePath()+File.separator+"ClusterQuality.tab"));
@@ -183,20 +202,7 @@ public class ClusterProfiles {
 		
 		K= bestC;
 		
-		Vector<VectorClusterElement>  bestCmeans = null;
-		double bestSilhouette = Double.MIN_VALUE;
-		
-		for(int b=0; b<numBootstraps; b++){
-			Pair<Pair<Double,Double>,Vector<VectorClusterElement>> currOut = doClustering(bestC, sparse_profiles);
-			double currSH = currOut.car().car();
-			if(currSH>bestSilhouette){
-				bestSilhouette = currSH;
-				bestCmeans = currOut.cdr();
-			}
-			
-		}
-		
-		List<Integer> clusAssignment = writeClusters(bestCmeans);
+		List<Integer> clusAssignment = writeClusters(bestClusterMeans.get(bestC));
 		
 		return clusAssignment;
 	}
@@ -302,7 +308,7 @@ public class ClusterProfiles {
 	 * @param pfls
 	 * @param otag
 	 */
-	public ClusterProfiles(int itrs, int k, ArrayList<int[]> pfls, HashMap<Integer,String> pflsIndsMap, int mink, int maxk, HashMap<Integer,Double> pflscores,File odir) {
+	public ClusterProfiles(int itrs, int k, ArrayList<int[]> pfls, HashMap<Integer,String> pflsIndsMap, int mink, int maxk, HashMap<Integer,Double> pflscores,File odir, double[] wts) {
 		numClusItrs = itrs;
 		setNumClusters(k);
 		setKmerModLenMin(mink);
@@ -310,6 +316,11 @@ public class ClusterProfiles {
 		setSparcedProfiles(pfls);
 		setProfileInds(pflsIndsMap);
 		setProfileScores(pflscores);
+		
+		modelWeights = new double[wts.length];
+		for(int w=0; w<wts.length; w++){
+			modelWeights[w] = wts[w];
+		}
 		
 		this.setOutdir(odir);
 		

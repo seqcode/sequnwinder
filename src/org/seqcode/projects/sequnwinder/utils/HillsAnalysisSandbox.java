@@ -240,7 +240,7 @@ public class HillsAnalysisSandbox {
 		}
 
 		List<Integer> clusterAssignment = new ArrayList<Integer>();
-		ClusterProfiles clusterManager = new ClusterProfiles(numClusterItrs,numClusters,profiles,profileIndices,Kmin,Kmax,profileScore,outdir);
+		ClusterProfiles clusterManager = new ClusterProfiles(numClusterItrs,numClusters,profiles,profileIndices,Kmin,Kmax,profileScore,outdir,kmerweights.get(modName));
 		clusterManager.execute();
 
 	}
@@ -263,7 +263,7 @@ public class HillsAnalysisSandbox {
 		}
 		
 		List<Integer> clusterAssignment = new ArrayList<Integer>();
-		ClusterProfiles clusterManager = new ClusterProfiles(numClusterItrs,numClusters,profiles,profileIndices,Kmin,Kmax,profileScore,outdir);
+		ClusterProfiles clusterManager = new ClusterProfiles(numClusterItrs,numClusters,profiles,profileIndices,Kmin,Kmax,profileScore,outdir,kmerweights.get(modName));
 		clusterAssignment = clusterManager.execute();
 		String[] randomSequences = new String[MemeER.MOTIF_FINDING_NEGSEQ];
 		List<Region> randomRegions = MemeER.randomRegionPick(gCon.getGenome(), null, MemeER.MOTIF_FINDING_NEGSEQ,150);
