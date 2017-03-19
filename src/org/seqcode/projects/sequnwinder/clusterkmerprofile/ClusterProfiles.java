@@ -232,6 +232,7 @@ public class ClusterProfiles {
 		Iterator<VectorClusterElement> itr = clusMeans.iterator();
 		int count = 0;
 		while(itr.hasNext()){
+			itr.next();
 			if(clusterCounts[count]<minClusSize){
 				itr.remove();
 			}
