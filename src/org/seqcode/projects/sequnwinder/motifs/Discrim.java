@@ -84,6 +84,7 @@ public class Discrim {
 		
 		protected ArrayList<int[]> profiles = new ArrayList<int[]>();
 		protected List<Integer> clusterAssignment = new ArrayList<Integer>();
+		protected int bestNumClusters = 2;
 		protected HashMap<Integer,String> posHillsToIndex =new HashMap<Integer,String>();
 		protected HashMap<Integer,Double> posHillScores =new HashMap<Integer,Double>();
 		protected File basedir_profiles;
@@ -137,7 +138,7 @@ public class Discrim {
 				// Now do meme search on each clusters separately
 				String memeargs = seqConfig.getMemeArgs();
 				MemeER meme = new MemeER(seqConfig.getMemePath(), memeargs);
-				for(int c=0; c<seqConfig.getNumDiscrimClusters(); c++){ // Over each cluster
+				for(int c=0; c<bestNumClusters; c++){ // Over each cluster
 					System.err.println("Loading sequences for meme analysis : "+kmerModelName+ "Cluster"+c);
 					int numHillsLoaded = 0;
 					List<String> seqs = new ArrayList<String>();
@@ -256,8 +257,9 @@ public class Discrim {
 			fillHills();
 			System.err.println("No of hills for K-mer model "+kmerModelName+" are :"+(seqConfig.getRegions().size() > 0 ? posHills.size() : posHillsSeqs.size()));
 			if(posHills.size() > 100 || posHillsSeqs.size() > 100){
-				ClusterProfiles clusterManager = new ClusterProfiles(SeqUnwinderConfig.ITRS_CLUS,seqConfig.getNumDiscrimClusters(),profiles,posHillsToIndex,seqConfig.getKmin(),seqConfig.getKmax(),posHillScores,basedir_profiles,seqConfig.getKmerWeights().get(kmerModelName));
+				ClusterProfiles clusterManager = new ClusterProfiles(SeqUnwinderConfig.ITRS_CLUS,profiles,posHillsToIndex,seqConfig.getKmin(),seqConfig.getKmax(),posHillScores,basedir_profiles);
 				clusterAssignment = clusterManager.execute();
+				bestNumClusters = clusterManager.getNumClusters();
 			}
 		}
 		

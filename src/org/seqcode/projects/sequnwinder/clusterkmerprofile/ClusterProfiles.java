@@ -11,10 +11,11 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
-
+import java.util.stream.IntStream;
 
 import org.seqcode.data.io.RegionFileUtilities;
 import org.seqcode.gseutils.Pair;
@@ -50,15 +51,15 @@ public class ClusterProfiles {
 	private int minK=4;
 	private int maxK=5;
 	
-	private double[] modelWeights;
 	
 	// Minimum penetrance of a K-mer in a cluster to be considered
 	public final double minKmerProp_global = 0.04;
-	public final double minKmerWeight = 0.01;
-	private int numBootstraps = 50;
+	private int numBootstraps = 100;
 	private final double bsSizeFraction = 0.1;
 	private final int minC = 2;
-	private final int maxC = 10;
+	private final int maxC = 7;
+	private final double allowableClusterSizeFraction = 0.1;
+	
 	
 
 	
@@ -109,26 +110,16 @@ public class ClusterProfiles {
 		}
 		
 		
-		//remove this later
-		StringBuilder sb = new StringBuilder();
-		
 		// Find the colnames of the once that will be kept and store the colnames in a list
 		for(int i=0; i<feature_penetrance.length; i++){
 			feature_penetrance[i] = feature_penetrance[i]/pfs.size();
-			if(feature_penetrance[i] > minKmerProp_global && modelWeights[i]>minKmerWeight){
-				sb.append(getKmerName(i));sb.append("\t");sb.append(feature_penetrance[i]);sb.append("\n");
+			if(feature_penetrance[i] > minKmerProp_global ){
 				sparse_colnames.add(getKmerName(i));
 			}
 		}
-		
-		System.err.println(sb.toString());
-		//System.exit(1);
 			
 		// Now make the sparse profiles
 		int sparce_length = sparse_colnames.size();
-		//System.err.println(sparce_length);
-
-		
 		
 		for(int[] p : pfs){
 			double[] sparce_p = new double[sparce_length];
@@ -202,6 +193,7 @@ public class ClusterProfiles {
 		
 		K= bestC;
 		
+		// Caution: the value of K might change in the "writClusters" method also
 		List<Integer> clusAssignment = writeClusters(bestClusterMeans.get(bestC));
 		
 		return clusAssignment;
@@ -228,9 +220,30 @@ public class ClusterProfiles {
 	// Slave methods
 	private List<Integer> writeClusters(Vector<VectorClusterElement> clusMeans) throws IOException{
 		List<Integer> clusterAssignment = new ArrayList<Integer>();
+		int[] clusterCounts = new int[K];
+		for(int p=0; p<sparse_profiles.size(); p++){
+			int memebership = getClusterAssignment(sparse_profiles.get(p),clusMeans);
+			///clusterAssignment.add(memebership);
+			clusterCounts[memebership]++;
+		}
+		
+		// Remove clusters that have less than "allowableClusterSizeFraction" of the largest cluster
+		int minClusSize = (int)(IntStream.of(numClusItrs).max().getAsInt()*allowableClusterSizeFraction);
+		Iterator<VectorClusterElement> itr = clusMeans.iterator();
+		int count = 0;
+		while(itr.hasNext()){
+			if(clusterCounts[count]<minClusSize){
+				itr.remove();
+			}
+			count++;
+		}
+		
+		K = clusMeans.size();
+		
 		File clusout = new File(outdir.getAbsolutePath()+File.separator+"ClusterAssignment.list");
 		FileWriter ow = new FileWriter(clusout);
 		BufferedWriter bw = new BufferedWriter(ow);
+		
 		for(int p=0; p<sparse_profiles.size(); p++){
 			int memebership = getClusterAssignment(sparse_profiles.get(p),clusMeans);
 			clusterAssignment.add(memebership);
@@ -239,6 +252,7 @@ public class ClusterProfiles {
 		bw.close();
 		return clusterAssignment;
 	}
+	
 	
 	private int getClusterAssignment(VectorClusterElement pfl, Vector<VectorClusterElement> clusMeans){
 		int minCluster = -1;
@@ -308,19 +322,15 @@ public class ClusterProfiles {
 	 * @param pfls
 	 * @param otag
 	 */
-	public ClusterProfiles(int itrs, int k, ArrayList<int[]> pfls, HashMap<Integer,String> pflsIndsMap, int mink, int maxk, HashMap<Integer,Double> pflscores,File odir, double[] wts) {
+	public ClusterProfiles(int itrs, ArrayList<int[]> pfls, HashMap<Integer,String> pflsIndsMap, int mink, int maxk, HashMap<Integer,Double> pflscores,File odir) {
 		numClusItrs = itrs;
-		setNumClusters(k);
 		setKmerModLenMin(mink);
 		setKmerModLenMax(maxk);
 		setSparcedProfiles(pfls);
 		setProfileInds(pflsIndsMap);
 		setProfileScores(pflscores);
 		
-		modelWeights = new double[wts.length];
-		for(int w=0; w<wts.length; w++){
-			modelWeights[w] = wts[w];
-		}
+		
 		
 		this.setOutdir(odir);
 		

@@ -118,8 +118,7 @@ public class SeqUnwinderConfig implements Serializable{
 	public static final int NUM_HILLS = 750;
 	/** No of iterations of clustering */
 	public static final int ITRS_CLUS=10;
-	/** Number of cluster; ideally each cluster corresponds to a motif */
-	protected int numClus_CLUS=3;
+	
 	// Meme parameters
 	protected String MEMEpath;
 	protected String MEMEargs = " -dna -mod zoops -revcomp -nostatus ";
@@ -180,7 +179,6 @@ public class SeqUnwinderConfig implements Serializable{
 	public List<String> getMNames(){return modelNames;}
 	public String getMemeArgs(){String memeargs = MEMEargs+" -nmotifs "+MEMEnmotifs + " -minw "+MEMEminw+" -maxw "+MEMEmaxw; return memeargs;}
 	public String getMemePath(){return MEMEpath;}
-	public int getNumDiscrimClusters(){return numClus_CLUS;}
 	public int getMemeSearchWin(){return MEMEwin;}
 	public int getMinM(){return minM;}
 	public int getMaxM(){return maxM;}
@@ -370,7 +368,6 @@ public class SeqUnwinderConfig implements Serializable{
 		MEMEnmotifs = Args.parseInteger(args, "memenmotifs", 3);
 
 		// Load arguments for Discrim analysis
-		numClus_CLUS = Args.parseInteger(args, "numClusters", 3);
 		minM = Args.parseInteger(args, "minScanLen", 6);
 		maxM = Args.parseInteger(args, "maxScanLen", 10);
 		thresold_hills = Args.parseDouble(args, "hillsThresh", 0.1);
