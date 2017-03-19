@@ -144,7 +144,7 @@ public class LOne extends Optimizer {
 				System.err.println("			Updated label feature weights!!"); // 3 tabs
 			}
 			// Check Convergence
-			boolean converged = true;
+			boolean converged = false;
 			
 			Double[] deltas = new Double[classStructure.allNodes.values().size()];
 			Double[] targets = new Double[classStructure.allNodes.values().size()];
