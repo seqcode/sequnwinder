@@ -25,6 +25,7 @@ import org.seqcode.genome.location.Region;
 import org.seqcode.genome.location.RepeatMaskedRegion;
 import org.seqcode.genome.sequence.SequenceGenerator;
 import org.seqcode.gsebricks.verbs.location.ChromRegionIterator;
+import org.seqcode.gsebricks.verbs.location.ChromosomeGenerator;
 import org.seqcode.gsebricks.verbs.location.RepeatMaskedGenerator;
 import org.seqcode.gseutils.ArgParser;
 import org.seqcode.gseutils.Args;
@@ -43,12 +44,14 @@ public class SeqUnwinderConfig implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public static String version = "0.1";
+	public static String version = "0.1.2";
 	
 	// General options
 	protected GenomeConfig gcon;
 	protected SequenceGenerator<Region> seqgen = null;
+	protected RepeatMaskedGenerator<Region> repMask;
 	protected String[] args;
+	private double repPropLimit=0.5;
 	
 	// Feature options (for making the arff file and beyond)
 	protected int minK=4;
@@ -85,10 +88,10 @@ public class SeqUnwinderConfig implements Serializable{
 	/** Augmented Lagrangian parameter rho */
 	protected double m_ADMM_pho=1.7;
 	protected int m_ADMM_numThreads=5;
-	protected int m_SeqUnwinder_MaxIts=20;
+	protected int m_SeqUnwinder_MaxIts=15;
 	protected int m_ADMM_MaxIts=500;
 	protected int sm_NumLayers=2;
-	protected int numCrossValidation=2;
+	protected int numCrossValidation=3;
 	/** Relaxation parameter (to help faster convergence) */
 	public static final double ADMM_ALPHA=1.9;
 	/** Absolute feasibility tolerance for the primal and dual feasibility conditions */
@@ -145,6 +148,7 @@ public class SeqUnwinderConfig implements Serializable{
 	protected HashMap<String,double[]> trainSetStats = new HashMap<String,double[]>();
 	
 	//Settors
+	public void resetPeakAnnotations(List<String> modifiedAnnotations){annotations.clear();annotations.addAll(modifiedAnnotations);}
 	public void setSubGroupNames(LinkedHashSet<String> sGNs){kmerSubGroupNames.addAll(sGNs);}
 	public void setModelNames(List<String> modNames){modelNames.addAll(modNames);}
 	public void setNumLayers(int n){sm_NumLayers = n;}
@@ -155,6 +159,7 @@ public class SeqUnwinderConfig implements Serializable{
 	public void setDiscrimMotifsRocs(HashMap<String, Double> dscrimRocs){discrimMotifRocs.putAll(dscrimRocs);}
 	public void setTrainSetStats(HashMap<String,double[]> trainStats){trainSetStats.putAll(trainStats);}
 	public void setTestSetStats(HashMap<String,double[]> tesetStats){testSetStats.putAll(tesetStats);}
+	public void setSeqUnwinderMaxIts(int maxItrs){m_SeqUnwinder_MaxIts = maxItrs;}
 	
 	//Gettors
 	public List<Point> getPeaks(){return peaks;}
@@ -239,19 +244,19 @@ public class SeqUnwinderConfig implements Serializable{
 		}
 
 		// Load peaks and annotations
-		if(!ap.hasKey("peaks") && !ap.hasKey("seqs") && !ap.hasKey("fasta")){
+		if(!ap.hasKey("GenRegs") && !ap.hasKey("GenSeqs") && !ap.hasKey("fasta")){
 			System.err.println("Please provide genomic locations with labels/annotations and try again !!");
 			SeqUnwinderConfig.getSeqUnwinderArgsList();
 			System.exit(1);
-		}else if(ap.hasKey("peaks")){
+		}else if(ap.hasKey("GenRegs")){
 			// Reading peaks files and storing annotations
-			String peaksFile = ap.getKeyValue("peaks");
+			String peaksFile = ap.getKeyValue("GenRegs");
 
 			FileReader fr = new FileReader(peaksFile);
 			BufferedReader br = new BufferedReader(fr);
 			String line;
 			while((line = br.readLine()) != null){
-				if(!line.startsWith("#")){
+				if(!line.startsWith("#") && (line.contains(":") || line.contains("-"))){
 					String[] pieces = line.split("\t");
 					annotations.add(pieces[1]);
 				}
@@ -263,9 +268,9 @@ public class SeqUnwinderConfig implements Serializable{
 			
 			// Converting peaks to regions
 			regions.addAll(RegionFileUtilities.loadRegionsFromPeakFile(gcon.getGenome(), peaksFile, win));
-		}else if(ap.hasKey("seqs")){
+		}else if(ap.hasKey("GenSeqs")){
 			// Reading peaks files and storing annotations
-			String seqsFile = ap.getKeyValue("seqs");
+			String seqsFile = ap.getKeyValue("GenSeqs");
 
 			FileReader fr = new FileReader(seqsFile);
 			BufferedReader br = new BufferedReader(fr);
@@ -281,6 +286,43 @@ public class SeqUnwinderConfig implements Serializable{
 		}else if(ap.hasKey("fasta")){
 			fastaFname = ap.getKeyValue("fasta");
 		}
+		
+		if(ap.hasKey("screenRepeats")){
+			screenReps = true;
+			repMask = new RepeatMaskedGenerator<Region>(gcon.getGenome()); 
+
+			if(peaks.size() > 0){
+
+				Iterator<Point> peakItr = peaks.iterator();
+				Iterator<Region> regionItr = regions.iterator();
+				Iterator<String> annotationItr = annotations.iterator();
+
+				while(peakItr.hasNext()){
+
+					Point currPeak = peakItr.next();
+					Region currRegion = regionItr.next();
+					String currAnnotation = annotationItr.next();
+
+					double repLen = 0;
+					Iterator<RepeatMaskedRegion> repItr = repMask.execute(currRegion);
+					while (repItr.hasNext()) {
+						RepeatMaskedRegion currRep = repItr.next();
+						if (currRep.overlaps(currRegion)) {
+							repLen += (double) currRep.getWidth();
+						}
+					}
+					if (repLen / (double) currRegion.getWidth() > repPropLimit){
+						peakItr.remove();
+						regionItr.remove();
+						annotationItr.remove();
+					}
+						
+
+				}
+			}
+
+
+		}		
 
 		//Check if any subclasses have less the minimum number of allowed training instances
 		if(ap.hasKey("mergeLow")){
@@ -298,8 +340,7 @@ public class SeqUnwinderConfig implements Serializable{
 				System.exit(1);
 			}
 		}
-		if(ap.hasKey("screenRepeats"))
-			screenReps = true;
+		
 		
 		// Now create randregs if needed
 		if(generateRandRegs){
@@ -322,6 +363,7 @@ public class SeqUnwinderConfig implements Serializable{
 			// Now add "Random" to annotations
 			for(Region r :  randRegs){
 				peaks.add(r.getMidpoint());
+				regions.add(r);
 				annotations.add("Random");
 			}
 			
@@ -333,9 +375,9 @@ public class SeqUnwinderConfig implements Serializable{
 		m_Ridge = Args.parseDouble(args, "R", 10);
 		m_ADMM_pho = Args.parseDouble(args, "PHO", 1.7);
 		m_ADMM_MaxIts = Args.parseInteger(args, "A", 500);
-		m_SeqUnwinder_MaxIts = Args.parseInteger(args, "S", 20);
+		m_SeqUnwinder_MaxIts = Args.parseInteger(args, "S", 15);
 		m_ADMM_numThreads = Args.parseInteger(args, "threads", 5);
-		numCrossValidation = Args.parseInteger(args, "X", 2);
+		numCrossValidation = Args.parseInteger(args, "X", 3);
 		
 		// Now make the weka options string
 		if(!debugMode)
@@ -511,32 +553,20 @@ public class SeqUnwinderConfig implements Serializable{
 				"\t--out <output file prefix>\n" +
 				"\t--threads <number of threads to use>\n" +
 				"\t--debug [flag to run in debug mode; prints extra output]\n" +
-				" Genome:\n" +
+				"\t--memepath <path to the meme bin dir (default: meme is in $PATH)>\n" +
+				" Specify the genome:\n" +
 				"\t--geninfo <genome info file> AND --seq <fasta seq directory reqd if using motif prior>\n" +
 				" Loading Data:\n" +
-				"\t--peaks <List of TF binding sites with annotations; eg: chr1:151736000  Shared;Proximal> OR" +
-				"\t--seqs <DNA sequences around at TF binding sites; eg: ATGC...TGC	Shared;Proximal>\n"+
+				"\t--GenRegs <List of TF binding sites with annotations; eg: chr1:151736000  Shared;Proximal> OR" +
+				"\t--GenSeqs <DNA sequences around at TF binding sites; eg: ATGC...TGC	Shared;Proximal>\n"+
 				"\t--win <window around peaks to consider for k-mer counting>\n" +
 				"\t--makerandregs <Flag to make random genomic regions as an extra outgroup class in classification (Only applicable when genome is provide.)>\n" +
 				"\t--screenRepeats <flag to screen replicates while creating random genomic regions>\n" +
-				" Running SeqUnwinder:\n" +
+				" Modelling options (Highly recommend using defaul options):\n" +
 				"\t--minK <minimum length of k-mer (default = 4)>\n" + 
 				"\t--maxK <maximum length of k-mer (default = 5)>\n" + 
-				"\t--R <regularization constant (default = 10)>\n" + 
-				"\t--PHO < (Augmented Lagrangian parameter default = 1.7)>\n" +
-				"\t--A < (Maximum number of allowed ADMM iterations default = 500)>\n" +
-				"\t--S < (Maximum number of allowed SeqUnwinder iterations default = 20)>\n" +
-				"\t--X < (Number of folds for cross validation default = 2)>\n" +
-				"\t--memepath <path to the meme bin dir (default: meme is in $PATH)>\n" +
-				"\t--memenmotifs <number of motifs MEME should find for each condition (default=3)>\n" +
-				"\t--mememinw <minw arg for MEME (default=6)>\n"+
-				"\t--mememaxw <maxw arg for MEME (default=18)>\n"+
-				"\t--memeargs <additional args for MEME (default=  -dna -mod zoops -revcomp -nostatus)>\n"+
-				"\t--memeSearchWin <window around hills to search for discriminative motifs (default=16)>\n"+
-				"\t--numClusters <number of clusters to split k-mer hills using k-means (default=3)>\n"+
-				"\t--minScanLen <minimum length of the window to scan k-mer models (default=6)>\n"+
-				"\t--maxScanLen <maximum length of the window to scan k-mer models (default=10)>\n"+
-				"\t--hillsThresh <thresholding for detecting hills (default=0.1)>\n"+
+				"\t--R <regularization constant (default = 10)>\n" +
+				"\t--X < (Number of folds for cross validation default = 3)>\n" +
 				""));
 	}
 
@@ -561,7 +591,7 @@ public class SeqUnwinderConfig implements Serializable{
 		private int numSamples = 1000;
 		private int validSamples=0;
 
-		private RepeatMaskedGenerator<Region> repMask;
+		//private RepeatMaskedGenerator<Region> repMask;
 		private double genomeSize=0;
 		private long [] chromoSize;
 		private String [] chromoNames;
@@ -575,9 +605,6 @@ public class SeqUnwinderConfig implements Serializable{
 		public void setScreenRepeats(boolean s){screenRepeats=s;}
 
 		public RandRegionsGenerator(boolean screenReps, int num) {
-			if(screenReps){
-				repMask = new RepeatMaskedGenerator<Region>(gcon.getGenome());
-			}
 			setScreenRepeats(screenReps);
 			setNum(num);
 		}

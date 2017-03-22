@@ -54,10 +54,10 @@ public class ClusterProfiles {
 	
 	// Minimum penetrance of a K-mer in a cluster to be considered
 	public final double minKmerProp_global = 0.04;
-	private int numBootstraps = 100;
-	private final double bsSizeFraction = 0.1;
+	private int numBootstraps = 30;
+	private final double bsSizeFraction = 0.3;
 	private final int minC = 2;
-	private final int maxC = 7;
+	private final int maxC = 6;
 	private final double allowableClusterSizeFraction = 0.1;
 	
 	

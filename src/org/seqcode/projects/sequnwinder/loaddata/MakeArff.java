@@ -101,6 +101,7 @@ public class MakeArff {
 		// Now, if a subgroup has the same name as the label then do this:
 		// sname ==> snameOnLy#sname 
 		// change in "subGroupsAtPeaks" also
+		// And also reset the annotaions in Config. Keep ";" instead of "#"
 		List<String> snamesToChange = new ArrayList<String>();
 		for(String sname : subGroupNames){
 			for(String l : labelNames.keySet()){
@@ -123,11 +124,19 @@ public class MakeArff {
 			}
 		}
 		
+		List<String> modifiedAnnotations = new ArrayList<String>();
+		for(String s : subGroupsAtPeaks){
+			modifiedAnnotations.add(s.replaceAll("#", ";"));
+		}
+		
+		seqConfig.resetPeakAnnotations(modifiedAnnotations);
+		
 		// ############################################################################
 		// Making design file
 		// Set the number of layers to the config file
 		if(labelNames.size() == 0){
 			seqConfig.setNumLayers(1);
+			seqConfig.setSeqUnwinderMaxIts(1);
 		}else{
 			seqConfig.setNumLayers(2);
 		}
