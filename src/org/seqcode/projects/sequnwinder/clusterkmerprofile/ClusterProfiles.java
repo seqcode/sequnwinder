@@ -274,6 +274,7 @@ public class ClusterProfiles {
 		boolean ret = true;
 		int brkFactor = (int) sparse_profiles.size()/dataSplitUnits;
 		int brkInd = (int)(ind/brkFactor);
+		brkInd = (brkInd >= dataSplitUnits) ? (dataSplitUnits-1) : brkInd;
 		
 		int maxToAdd = Math.min(maxSplitSize, (int)(bsSizeFraction*brkFactor));
 		
