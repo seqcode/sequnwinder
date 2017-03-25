@@ -230,7 +230,7 @@ public class ClusterProfiles {
 		}
 		
 		// Remove clusters that have less than "allowableClusterSizeFraction" of the largest cluster
-		int minClusSize = (int)(IntStream.of(numClusItrs).max().getAsInt()*allowableClusterSizeFraction);
+		int minClusSize = (int)(IntStream.of(clusterCounts).max().getAsInt()*allowableClusterSizeFraction);
 		Iterator<VectorClusterElement> itr = clusMeans.iterator();
 		int count = 0;
 		while(itr.hasNext()){
