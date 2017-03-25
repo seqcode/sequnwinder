@@ -55,10 +55,12 @@ public class ClusterProfiles {
 	// Minimum penetrance of a K-mer in a cluster to be considered
 	public final double minKmerProp_global = 0.04;
 	private int numBootstraps = 30;
-	private final double bsSizeFraction = 0.3;
+	private final double bsSizeFraction = 0.5;
 	private final int minC = 2;
 	private final int maxC = 6;
 	private final double allowableClusterSizeFraction = 0.1;
+	private final int dataSplitUnits = 3;
+	private final int maxSplitSize = 1000;
 	
 	
 
@@ -267,17 +269,35 @@ public class ClusterProfiles {
         }
         return minCluster;
 	}
+	
+	private Pair<Boolean,Integer> addBsDataPoint(int ind, int[] addedCounts){
+		boolean ret = true;
+		int brkFactor = (int) sparse_profiles.size()/dataSplitUnits;
+		int brkInd = (int)(ind/brkFactor);
+		
+		int maxToAdd = Math.min(maxSplitSize, (int)(bsSizeFraction*brkFactor));
+		
+		if(addedCounts[brkInd] > maxToAdd)
+			ret = false;
+		return new Pair<Boolean,Integer>(ret,brkInd);
+	}
 
 	
 	private ArrayList<VectorClusterElement> generateBootStrapSample(){
 		ArrayList<VectorClusterElement> ret = new ArrayList<VectorClusterElement>();
 		Random rand = new Random();
 		int maxInd = sparse_profiles.size();
-		int count = 0;
-		while(count <(int)(bsSizeFraction*maxInd)){
-			ret.add(sparse_profiles.get(rand.nextInt(maxInd)));
-			count++;
+		
+		int[] added = new int[dataSplitUnits];
+		int currRand =  rand.nextInt(maxInd);
+		while(addBsDataPoint(currRand,added).car()){
+			added[addBsDataPoint(currRand,added).cdr()]++;
+			ret.add(sparse_profiles.get(currRand));
+			currRand = rand.nextInt(maxInd);
 		}
+		//for(int i=0; i<added.length;i++){
+		//	System.out.println(added[i]);
+		//}
 		return ret;
 	}
 	

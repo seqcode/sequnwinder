@@ -363,7 +363,6 @@ public class SeqUnwinderConfig implements Serializable{
 			// Now add "Random" to annotations
 			for(Region r :  randRegs){
 				peaks.add(r.getMidpoint());
-				regions.add(r);
 				annotations.add("Random");
 			}
 			
