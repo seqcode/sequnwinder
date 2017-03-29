@@ -59,6 +59,7 @@ public class ClusterProfiles {
 	private final int minC = 2;
 	private final int maxC = 6;
 	private final double allowableClusterSizeFraction = 0.1;
+	private final int minAllowableClusterSize = 500;
 	private final int dataSplitUnits = 3;
 	private final int maxSplitSize = 1000;
 	
@@ -230,7 +231,7 @@ public class ClusterProfiles {
 		}
 		
 		// Remove clusters that have less than "allowableClusterSizeFraction" of the largest cluster
-		int minClusSize = (int)(IntStream.of(clusterCounts).max().getAsInt()*allowableClusterSizeFraction);
+		int minClusSize = Math.min((int)(IntStream.of(clusterCounts).max().getAsInt()*allowableClusterSizeFraction),minAllowableClusterSize);
 		Iterator<VectorClusterElement> itr = clusMeans.iterator();
 		int count = 0;
 		while(itr.hasNext()){
