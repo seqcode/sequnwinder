@@ -151,7 +151,10 @@ public class SeqUnwinderConfig implements Serializable{
 	public void resetPeakAnnotations(List<String> modifiedAnnotations){annotations.clear();annotations.addAll(modifiedAnnotations);}
 	public void setSubGroupNames(LinkedHashSet<String> sGNs){kmerSubGroupNames.addAll(sGNs);}
 	public void setModelNames(List<String> modNames){modelNames.addAll(modNames);}
-	public void setNumLayers(int n){sm_NumLayers = n;}
+	public void setNumLayers(int n){
+		sm_NumLayers = n;
+		wekaOptsString[7] = Integer.toString(sm_NumLayers);
+	}
 	public void setWeights(HashMap<String,double[]> wts){kmerweights.putAll(wts);}
 	public void setDiscrimMotifs(List<WeightMatrix> mots){discrimMotifs.addAll(mots);}
 	public void setDiscrimMotifScores(HashMap<String,double[]> scrs){discrimMotifScores.putAll(scrs);}
@@ -159,7 +162,10 @@ public class SeqUnwinderConfig implements Serializable{
 	public void setDiscrimMotifsRocs(HashMap<String, Double> dscrimRocs){discrimMotifRocs.putAll(dscrimRocs);}
 	public void setTrainSetStats(HashMap<String,double[]> trainStats){trainSetStats.putAll(trainStats);}
 	public void setTestSetStats(HashMap<String,double[]> tesetStats){testSetStats.putAll(tesetStats);}
-	public void setSeqUnwinderMaxIts(int maxItrs){m_SeqUnwinder_MaxIts = maxItrs;}
+	public void setSeqUnwinderMaxIts(int maxItrs){
+		m_SeqUnwinder_MaxIts = maxItrs;
+		wekaOptsString[13]= Integer.toString(m_SeqUnwinder_MaxIts);
+	}
 	
 	//Gettors
 	public List<Point> getPeaks(){return peaks;}
