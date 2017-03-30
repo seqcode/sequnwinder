@@ -1,17 +1,19 @@
 package org.seqcode.projects.sequnwinder.motifs;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-
 import org.seqcode.data.io.RegionFileUtilities;
 import org.seqcode.data.motifdb.WeightMatrix;
 import org.seqcode.genome.sequence.SequenceUtils;
+import org.seqcode.gseutils.ArgParser;
+import org.seqcode.motifs.FreqMatrixImport;
 import org.seqcode.projects.sequnwinder.framework.SeqUnwinderConfig;
 
 
@@ -69,6 +71,70 @@ public class ScoreMotif {
 		bw.close();
 		seqConfig.setDiscrimMotifScores(scores);
 		
+	}
+	
+	/***
+	 * Main method only for testing
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException{
+		SeqUnwinderConfig scon = new SeqUnwinderConfig(args);
+		ArgParser ap = new ArgParser(args);
+		List<WeightMatrix> mots = new ArrayList<WeightMatrix>();
+		if(ap.hasKey("motifs")){
+			mots.addAll(FreqMatrixImport.readTransfacMatricesAsFreqMatrices(ap.getKeyValue("motifs")));
+		}
+		
+		List<String> modnames = new ArrayList<String>();
+		HashMap<String,double[]> kmerweights = new HashMap<String,double[]>();
+		
+		if(ap.hasKey("kmerWeights")){
+			BufferedReader br = new BufferedReader(new FileReader(ap.getKeyValue("kmerWeights")));
+			String line = null;
+			
+			while((line=br.readLine())!=null){
+				line.trim();
+				String[] pieces = line.split("\t");
+				if(pieces[0].contains("Kmer")){ // header
+					for(int s=1; s<pieces.length; s++){
+						modnames.add(pieces[s]);
+						kmerweights.put(pieces[s], new double[scon.getNumK()]);
+					}
+				}else{
+					int ind = scon.getKmerBaseInd(pieces[0]) + RegionFileUtilities.seq2int(pieces[0]);
+					for(int i = 1; i < pieces.length; i++ ){
+						kmerweights.get(modnames.get(i-1))[ind] = Double.parseDouble(pieces[i]);
+					}
+				}
+			}
+			
+			br.close();
+		}
+		
+		scon.setDiscrimMotifs(mots);
+		scon.setModelNames(modnames);
+		scon.setWeights(kmerweights);
+		
+		ScoreMotif scorer = new ScoreMotif(scon);
+		scorer.execute();
+		HashMap<String,double[]> scores = scon.getDiscrimMotsScore();
+		StringBuilder sb = new StringBuilder();
+		sb.append("MotifName");sb.append("\t");
+		for(String mname: modnames){
+			sb.append(mname);sb.append("\t");
+		}
+		sb.deleteCharAt(sb.length()-1);sb.append("\n");
+		for(WeightMatrix mot : mots){
+			double[] scrs = scores.get(mot.getName());
+			sb.append(mot.getName());sb.append("\t");
+			for(int d=0; d<scrs.length; d++){
+				sb.append(scrs[d]);sb.append("\t");
+			}
+			sb.deleteCharAt(sb.length()-1);sb.append("\n");
+		}
+			
+		System.out.println(sb.toString());
 	}
 	
 }
