@@ -273,8 +273,8 @@ public class Outputwriter {
     	fout.write("\t<table>\n");
     	fout.write("\t\t<tr>" +
     			"\t\t<th>Class</th>\n" +
-    			"\t\t<th>TP Rare</th>\n" +
-    			"\t\t<th>FP Rare</th>\n" +
+    			"\t\t<th>TP Rate</th>\n" +
+    			"\t\t<th>FP Rate</th>\n" +
     			"\t\t<th>Precision</th>\n" +
     			"\t\t<th>Recall</th>\n" +
     			"\t\t<th>F-Measure</th>\n" +
@@ -302,8 +302,8 @@ public class Outputwriter {
     	fout.write("\t<table>\n");
     	fout.write("\t\t<tr>" +
     			"\t\t<th>Class</th>\n" +
-    			"\t\t<th>TP Rare</th>\n" +
-    			"\t\t<th>FP Rare</th>\n" +
+    			"\t\t<th>TP Rate</th>\n" +
+    			"\t\t<th>FP Rate</th>\n" +
     			"\t\t<th>Precision</th>\n" +
     			"\t\t<th>Recall</th>\n" +
     			"\t\t<th>F-Measure</th>\n" +
@@ -326,14 +326,14 @@ public class Outputwriter {
     	}
     	fout.write("\t</table>\n");
     	
-    	fout.write("\t<p><a href='kmer_weights.mat'> Weighted K-mer model.</a>\n");
+    	fout.write("\t<p><a href='kmer_weights.mat'> Weighted K-mer models.</a>\n");
     	
     	// Print the de novo identified motifs
     	fout.write("\t<h2>De novo motifs</h2>\n");
     	fout.write("\t<table>\n");
     	fout.write("\t\t<tr>" +
-    			"\t\t<th>Class</th>\n" +
-    			"\t\t<th>Motif</th>\n");
+    			"\t\t<th>SubClass/Lables</th>\n" +
+    			"\t\t<th>De novo motifs</th>\n");
     	fout.write("\t\t</tr>\n");
 
     	for(String s: seqConfig.getMNames()){

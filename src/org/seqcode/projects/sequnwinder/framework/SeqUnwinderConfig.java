@@ -409,14 +409,14 @@ public class SeqUnwinderConfig implements Serializable{
 		MEMEargs = Args.parseString(args, "memeargs", MEMEargs);
 		
 		MEMEminw = Args.parseInteger(args, "mememinw", 6);
-		MEMEmaxw = Args.parseInteger(args, "mememaxw", 11);
+		MEMEmaxw = Args.parseInteger(args, "mememaxw", 13);
 		//Size of the focussed meme search win
 		MEMEwin = Args.parseInteger(args, "memeSearchWin", 16);
 		MEMEnmotifs = Args.parseInteger(args, "memenmotifs", 3);
 
 		// Load arguments for Discrim analysis
 		minM = Args.parseInteger(args, "minScanLen", 6);
-		maxM = Args.parseInteger(args, "maxScanLen", 10);
+		maxM = Args.parseInteger(args, "maxScanLen", 14);
 		thresold_hills = Args.parseDouble(args, "hillsThresh", 0.1);
 		
 		
@@ -548,30 +548,38 @@ public class SeqUnwinderConfig implements Serializable{
 
 	public static String getSeqUnwinderArgsList(){
 		return(new String("" +
-				"Copyright (C) Akshay Kakumanu 2015-2016\n" +
+				"Copyright (C) Akshay Kakumanu 2016-2017\n" +
 				"\n" +
 				"SeqUnwinder comes with ABSOLUTELY NO WARRANTY. This is free software, and you\n"+
 				"are welcome to redistribute it under certain conditions.  See the MIT license \n"+
 				"for details.\n"+
 				"\n OPTIONS:\n" +
 				" General:\n"+
-				"\t--out <output file prefix>\n" +
+				"\t--out <prefix>: Ouput file prefix. All output will be put into a directory with the prefix name\n" +
 				"\t--threads <number of threads to use>\n" +
-				"\t--debug [flag to run in debug mode; prints extra output]\n" +
+				"\t--debug: Flag to run in debug mode; prints extra output\n" +
 				"\t--memepath <path to the meme bin dir (default: meme is in $PATH)>\n" +
 				" Specify the genome:\n" +
-				"\t--geninfo <genome info file> AND --seq <fasta seq directory reqd if using motif prior>\n" +
-				" Loading Data:\n" +
+				"\t--geninfo <genome info file> AND --seq <path>: A directory containing fasta format files corresponding to every named chromosome is required\n" +
+				" Input Genomic Regions:\n" +
 				"\t--GenRegs <List of TF binding sites with annotations; eg: chr1:151736000  Shared;Proximal> OR" +
 				"\t--GenSeqs <DNA sequences around at TF binding sites; eg: ATGC...TGC	Shared;Proximal>\n"+
-				"\t--win <window around peaks to consider for k-mer counting>\n" +
-				"\t--makerandregs <Flag to make random genomic regions as an extra outgroup class in classification (Only applicable when genome is provide.)>\n" +
-				"\t--screenRepeats <flag to screen replicates while creating random genomic regions>\n" +
-				" Modelling options (Highly recommend using defaul options):\n" +
-				"\t--minK <minimum length of k-mer (default = 4)>\n" + 
-				"\t--maxK <maximum length of k-mer (default = 5)>\n" + 
-				"\t--R <regularization constant (default = 10)>\n" +
-				"\t--X < (Number of folds for cross validation default = 3)>\n" +
+				"\t--win <int>: Size of the genomic regions in bp. Default = 150.\n" +
+				"\t--makerandregs: Flag to make random genomic regions as an extra outgroup class in classification (Only applicable when genome is provide.) \n" +
+				" SeqUnwinder modelling options \n" +
+				"\t--minK <int>: Minimum length of k-mer (default = 4)\n" + 
+				"\t--maxK <int>: Maximum length of k-mer (default = 5)>\n" + 
+				"\t--R <value>: Regularization constant (default = 10)>\n" +
+				"\t--X <int>: Number of folds for cross validation, default = 3.\n" +
+				"\t--mergeLow: Flag to merge subclasses with less than 200 sites with other relevant classes. By default, all subclasses with less that 200 sites are removed. \n" +
+				"Other SeqUnwinder options (Highly recommend using defaul options): \n"+
+				"\t--minScanLen <value>: Minimum length of the window to scan K-mer models. Default=8.\n"+
+				"\t--maxScanLen <value>: Maximum length of the window to scan K-mer models. Default=14.\n"+
+				"\t--hillsThresh <value>: Scoring threshold to identify hills. Default=0.1.\n"+
+				"\t--mememinw <value>: minw arg for MEME. Default=6.\n"+
+				"\t--mememaxw <value>: maxw arg for MEME. Default=13. This value should always be less than \"maxScanLen\".\n"+
+				"\t--memeSearchWin <value>: Window around hills to search for discriminative motifs. Default=16.\n"+
+				"\t--A <int>: Maximum number of allowed ADMM iterations. Default=500.\n"+
 				""));
 	}
 
