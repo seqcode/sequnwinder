@@ -70,7 +70,7 @@ Options (Required/important options are in __bold__.)
   * --win \<int\>:  Size of the genomic regions in bp. Default = 150.
   * --makerandregs: Flag to make random genomic regions as an extra outgroup class in classification (Only applicable when genome is provide).
 
-3. SeqUnwinder Model Options:
+4. SeqUnwinder Model Options:
 
   * --minK \<int\>: Minimum length of *K*-mer to consider. Default = 4.
   * --maxK \<int\>: Maximim length of *K*-mer to consider. Default = 5.
@@ -80,7 +80,7 @@ Options (Required/important options are in __bold__.)
   * --X \<int\>: Number of folds for cross validation. Default = 3.
   * --mergeLow: Flag to merge subclasses with less than 200 sites with other relevant classes. By default, all subclasses with less that 200 sites are removed.
   
-4. Other SeqUnwinder options (Highly recommend using defaul options):
+5. Other SeqUnwinder options (Highly recommend using defaul options):
 
   * --minScanLen \<value\>: Minimum length of the window to scan *K*-mer models. Default=8.
   * --maxScanLen \<value\>: Maximum length of the window to scan *K*-mer models. Default=14.
