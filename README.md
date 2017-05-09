@@ -43,7 +43,7 @@ Options (Required/important options are in __bold__.)
 1. General:
 
   * --__out__ \<prefix>: Output file prefix. All output will be put into a directory with the prefix name. 
-  * --threads \<n\>:  Use n threads during binding event detection. Default is 5 threads.
+  * --threads \<n\>:  Use n threads to train SeqUnwinder model. Default is 5 threads.
   * --debug: Flag to run in debug mode; prints extra output.
   * --memepath \<path\>: path to the meme bin dir (default: meme is in $PATH).
 
@@ -57,7 +57,7 @@ Options (Required/important options are in __bold__.)
 
 3. Input Genomic Regions:
 
-  * --__GenRegs__ \<file\>: Genomic regions with annotations filename OR --__GenSeqs__\<file\>: Sequences with annotations filename. A tab delimited file of a list of genomic points/sequences and corresponding annotations/labels. A simple example :
+  * --__genregs__ \<file\>: Genomic regions with annotations filename OR --__genseqs__\<file\>: Sequences with annotations filename. A tab delimited file of a list of genomic points/sequences and corresponding annotations/labels. A simple example :
       ```{r, engine='sh', count_lines}
 	GenRegs file:
 	chr10:100076604	enhancer;shared
@@ -72,23 +72,25 @@ Options (Required/important options are in __bold__.)
 
 4. SeqUnwinder Model Options:
 
-  * --minK \<int\>: Minimum length of *K*-mer to consider. Default = 4.
-  * --maxK \<int\>: Maximim length of *K*-mer to consider. Default = 5.
+  * --mink \<int\>: Minimum length of *K*-mer to consider. Default = 4.
+  * --maxk \<int\>: Maximim length of *K*-mer to consider. Default = 5.
    
      For most SeqUnwinder analysis described in the manuscript, *K*-mers of lengths 4 and 5 showed optimal performance. However, with larger datasets (with more data instances for training), maxk can be increased to 6 or 7. 
-  * --R \<value\>: Regularization co-efficient in the model. For most SeqUnwinder applications, with ~20k genomic sites and ~6 labels and *K*-mers of 4 and 5, a value of 10.0 has been very effective. However, the optimal value could change with datasets. One might want to use a range of values and choose the one that performs best (in terms of test accuracy).
-  * --X \<int\>: Number of folds for cross validation. Default = 3.
-  * --mergeLow: Flag to merge subclasses with fewer than 200 sites with other relevant classes. By default, all subclasses with less than 200 sites are removed.
+  * --r \<value\>: Regularization co-efficient in the model. For most SeqUnwinder applications, with ~20k genomic sites and ~6 labels and *K*-mers of 4 and 5, a value of 10.0 has been very effective. However, the optimal value could change with datasets. One might want to use a range of values and choose the one that performs best (in terms of test accuracy).
+  * --x \<int\>: Number of folds for cross validation. Default = 3.
+  * --mergelow: Flag to merge subclasses with fewer than 200 sites with other relevant classes. By default, all subclasses with less than 200 sites are removed.
   
 5. Other SeqUnwinder options (Highly recommend using defaul options):
 
-  * --minScanLen \<value\>: Minimum length of the window to scan *K*-mer models. Default=8.
-  * --maxScanLen \<value\>: Maximum length of the window to scan *K*-mer models. Default=14.
-  * --hillsThresh \<value\>: Scoring threshold to identify hills. Default=0.1.
+  * --minscanlen \<value\>: Minimum length of the window to scan *K*-mer models. Default=8.
+  * --maxscanlen \<value\>: Maximum length of the window to scan *K*-mer models. Default=14.
+  * --hillsthresh \<value\>: Scoring threshold to identify hills. Default=0.1.
   * --mememinw \<value\>: minw arg for MEME. Default=6.
   * --mememaxw \<value\>: maxw arg for MEME. Default=13. This value should always be less than "maxScanLen".
-  * --memeSearchWin \<value\>: Window around hills to search for discriminative motifs. Default=16
-  * --A \<int\>: Maximum number of allowed ADMM iterations. Default=500.
+  * --memenmotifs \<int\>: Number of motifs MEME should find in each condition (default=3)
+  * --memeargs \<args\> : Additional args for MEME (default:  -dna -mod zoops -revcomp -nostatus)
+  * --memesearchwin \<value\>: Window around hills to search for discriminative motifs. Default=16
+  * --a \<int\>: Maximum number of allowed ADMM iterations. Default=400.
 
 
 Example
