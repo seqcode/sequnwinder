@@ -581,10 +581,10 @@ public class SeqUnwinderConfig implements Serializable{
 				"\t--hillsthresh <value>: Scoring threshold to identify hills. Default=0.1.\n"+
 				"\t--mememinw <value>: minw arg for MEME. Default=6.\n"+
 				"\t--mememaxw <value>: maxw arg for MEME. Default=13. This value should always be less than \"maxscanlen\".\n"+
-				"\t‒‒memenmotifs <int>: Number of motifs MEME should find in each condition (default=3)\n" +
-				"\t‒‒memeargs <args> : Additional args for MEME (default:  -dna -mod zoops -revcomp -nostatus)\n"+
+				"\t--memenmotifs <int>: Number of motifs MEME should find in each condition (default=3)\n" +
+				"\t--memeargs <args> : Additional args for MEME (default:  -dna -mod zoops -revcomp -nostatus)\n"+
 				"\t--memesearchwin <value>: Window around hills to search for discriminative motifs. Default=16. (Only applicable when run with \"genregs\").\n"+
-				"\t--a <int>: Maximum number of allowed ADMM iterations. Default=500.\n"+
+				"\t--a <int>: Maximum number of allowed ADMM iterations. Default=400.\n"+
 				""));
 	}
 
