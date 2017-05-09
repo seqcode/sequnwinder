@@ -554,28 +554,28 @@ public class SeqUnwinderConfig implements Serializable{
 				"are welcome to redistribute it under certain conditions.  See the MIT license \n"+
 				"for details.\n"+
 				"\n OPTIONS:\n" +
-				"General:\n"+
+				" General:\n"+
 				"\t--out <prefix>: Ouput file prefix. All output will be put into a directory with the prefix name\n" +
 				"\t--threads <n>: Use n threads to train SeqUnwinder model. Default is 5 threads\n" +
 				"\t--debug: Flag to run in debug mode; prints extra output\n" +
 				"\t--memepath <path>: path to the meme bin dir (default: meme is in $PATH)\n" +
-				"Specify the genome:\n" +
+				" Specify the genome:\n" +
 				"\t--geninfo <genome info file> This file should list the lengths of all chromosomes on separate lines using the format chrName<tab>chrLength\n" + 
 				"\t\tAND\n" +  
 				"\t--seq <path>: A directory containing fasta format files corresponding to every named chromosome is required\n" +
-				"Input Genomic Regions:\n" +
+				" Input Genomic Regions:\n" +
 				"\t--genregs <List of TF binding sites with annotations; eg: chr1:151736000  Shared;Proximal>\n" +
 				"\t\tOR\n" + 
 				"\t--genseqs <DNA sequences around at TF binding sites; eg: ATGC...TGC	Shared;Proximal>\n"+
 				"\t--win <int>: Size of the genomic regions in bp. Default = 150.\n" +
 				"\t--makerandregs: Flag to make random genomic regions as an extra outgroup class in classification (Only applicable when genome is provide.) \n" +
-				"SeqUnwinder modelling options \n" +
+				" SeqUnwinder modelling options \n" +
 				"\t--mink <int>: Minimum length of k-mer (default = 4)\n" + 
 				"\t--maxk <int>: Maximum length of k-mer (default = 5)\n" + 
 				"\t--r <value>: Regularization constant (default = 10)\n" +
 				"\t--x <int>: Number of folds for cross validation, default = 3.\n" +
 				"\t--mergelow: Flag to merge subclasses with less than 200 sites with other relevant classes. By default, all subclasses with less that 200 sites are removed. \n" +
-				"Other SeqUnwinder options (Highly recommend using defaul options): \n"+
+				" Other SeqUnwinder options (Highly recommend using defaul options): \n"+
 				"\t--minscanlen <value>: Minimum length of the window to scan K-mer models. Default=8.\n"+
 				"\t--maxscanlen <value>: Maximum length of the window to scan K-mer models. Default=14.\n"+
 				"\t--hillsthresh <value>: Scoring threshold to identify hills. Default=0.1.\n"+
