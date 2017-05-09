@@ -560,10 +560,13 @@ public class SeqUnwinderConfig implements Serializable{
 				"\t--debug: Flag to run in debug mode; prints extra output\n" +
 				"\t--memepath <path>: path to the meme bin dir (default: meme is in $PATH)\n" +
 				"Specify the genome:\n" +
-				"\t--geninfo <genome info file> AND --seq <path>: A directory containing fasta format files corresponding to every named chromosome is required\n" +
+				"\t--geninfo <genome info file> This file should list the lengths of all chromosomes on separate lines using the format chrName<tab>chrLength\n" + 
+				"\tAND\n" +  
+				"\t--seq <path>: A directory containing fasta format files corresponding to every named chromosome is required\n" +
 				"Input Genomic Regions:\n" +
-				"\t--genregs <List of TF binding sites with annotations; eg: chr1:151736000  Shared;Proximal> OR" +
-				"--genseqs <DNA sequences around at TF binding sites; eg: ATGC...TGC	Shared;Proximal>\n"+
+				"\t--genregs <List of TF binding sites with annotations; eg: chr1:151736000  Shared;Proximal>\n" +
+				"\tOR\n" + 
+				"\t--genseqs <DNA sequences around at TF binding sites; eg: ATGC...TGC	Shared;Proximal>\n"+
 				"\t--win <int>: Size of the genomic regions in bp. Default = 150.\n" +
 				"\t--makerandregs: Flag to make random genomic regions as an extra outgroup class in classification (Only applicable when genome is provide.) \n" +
 				"SeqUnwinder modelling options \n" +
