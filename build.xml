@@ -8,7 +8,7 @@
   <property name="build.dist.dir" location="${build.dir}/dist" />
   <property name="build.unjar.dir" location="${build.dir}/unjar" />
   <property name="build.compiler" value="javac1.8"/>
-  <property name="pwfiles.basepath"  value="/storage/group/sam77_collab/code/pwfiles"/>
+  <property name="pwfiles.basepath"  value="/Users/akshaykakumanu/code"/>
   <property name="seqcode-core.classes.dir"  value="../seqcode-core/build/classes"/>
   <property name="seqcode-core.lib.dir"  value="../seqcode-core/lib"/>
   <property name="seqcode-core.unjar.dir"  value="../seqcode-core/build/unjar"/>

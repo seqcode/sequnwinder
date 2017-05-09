@@ -89,7 +89,7 @@ public class SeqUnwinderConfig implements Serializable{
 	protected double m_ADMM_pho=1.7;
 	protected int m_ADMM_numThreads=5;
 	protected int m_SeqUnwinder_MaxIts=15;
-	protected int m_ADMM_MaxIts=500;
+	protected int m_ADMM_MaxIts=400;
 	protected int sm_NumLayers=2;
 	protected int numCrossValidation=3;
 	/** Relaxation parameter (to help faster convergence) */
@@ -232,8 +232,8 @@ public class SeqUnwinderConfig implements Serializable{
 		// Set windown size around peaks
 		win = Args.parseInteger(args, "win", 150);
 
-		minK = Args.parseInteger(args, "minK", 4);
-		maxK = Args.parseInteger(args, "maxK", 5);
+		minK = Args.parseInteger(args, "mink", 4);
+		maxK = Args.parseInteger(args, "maxk", 5);
 
 		// Get outdir and outbase and make them; delete dirs that exist with the same
 		outbase = Args.parseString(args, "out", "seqUnwinder_out");
@@ -250,13 +250,13 @@ public class SeqUnwinderConfig implements Serializable{
 		}
 
 		// Load peaks and annotations
-		if(!ap.hasKey("GenRegs") && !ap.hasKey("GenSeqs") && !ap.hasKey("fasta")){
+		if(!ap.hasKey("genregs") && !ap.hasKey("genseqs") && !ap.hasKey("fasta")){
 			System.err.println("Please provide genomic locations with labels/annotations and try again !!");
 			SeqUnwinderConfig.getSeqUnwinderArgsList();
 			System.exit(1);
-		}else if(ap.hasKey("GenRegs")){
+		}else if(ap.hasKey("genregs")){
 			// Reading peaks files and storing annotations
-			String peaksFile = ap.getKeyValue("GenRegs");
+			String peaksFile = ap.getKeyValue("genregs");
 
 			FileReader fr = new FileReader(peaksFile);
 			BufferedReader br = new BufferedReader(fr);
@@ -274,9 +274,9 @@ public class SeqUnwinderConfig implements Serializable{
 			
 			// Converting peaks to regions
 			regions.addAll(RegionFileUtilities.loadRegionsFromPeakFile(gcon.getGenome(), peaksFile, win));
-		}else if(ap.hasKey("GenSeqs")){
+		}else if(ap.hasKey("genseqs")){
 			// Reading peaks files and storing annotations
-			String seqsFile = ap.getKeyValue("GenSeqs");
+			String seqsFile = ap.getKeyValue("genseqs");
 
 			FileReader fr = new FileReader(seqsFile);
 			BufferedReader br = new BufferedReader(fr);
@@ -293,7 +293,7 @@ public class SeqUnwinderConfig implements Serializable{
 			fastaFname = ap.getKeyValue("fasta");
 		}
 		
-		if(ap.hasKey("screenRepeats")){
+		if(ap.hasKey("screenrepeats")){
 			screenReps = true;
 			repMask = new RepeatMaskedGenerator<Region>(gcon.getGenome()); 
 
@@ -331,7 +331,7 @@ public class SeqUnwinderConfig implements Serializable{
 		}		
 
 		//Check if any subclasses have less the minimum number of allowed training instances
-		if(ap.hasKey("mergeLow")){
+		if(ap.hasKey("mergelow")){
 			mergeLowCountSubclasses();
 		}else{
 			removeLowCountSubclasses();
@@ -377,12 +377,12 @@ public class SeqUnwinderConfig implements Serializable{
 		// Now, load all options needed to run the classifier
 		// the regularization constant
 		debugMode = ap.hasKey("debug");
-		m_Ridge = Args.parseDouble(args, "R", 10);
-		m_ADMM_pho = Args.parseDouble(args, "PHO", 1.7);
-		m_ADMM_MaxIts = Args.parseInteger(args, "A", 500);
-		m_SeqUnwinder_MaxIts = Args.parseInteger(args, "S", 15);
+		m_Ridge = Args.parseDouble(args, "r", 10);
+		m_ADMM_pho = Args.parseDouble(args, "pho", 1.7);
+		m_ADMM_MaxIts = Args.parseInteger(args, "a", 400);
+		m_SeqUnwinder_MaxIts = Args.parseInteger(args, "s", 15);
 		m_ADMM_numThreads = Args.parseInteger(args, "threads", 5);
-		numCrossValidation = Args.parseInteger(args, "X", 3);
+		numCrossValidation = Args.parseInteger(args, "x", 3);
 		
 		// Now make the weka options string
 		if(!debugMode)
@@ -411,13 +411,13 @@ public class SeqUnwinderConfig implements Serializable{
 		MEMEminw = Args.parseInteger(args, "mememinw", 6);
 		MEMEmaxw = Args.parseInteger(args, "mememaxw", 13);
 		//Size of the focussed meme search win
-		MEMEwin = Args.parseInteger(args, "memeSearchWin", 16);
+		MEMEwin = Args.parseInteger(args, "memesearchwin", 16);
 		MEMEnmotifs = Args.parseInteger(args, "memenmotifs", 3);
 
 		// Load arguments for Discrim analysis
-		minM = Args.parseInteger(args, "minScanLen", 6);
-		maxM = Args.parseInteger(args, "maxScanLen", 14);
-		thresold_hills = Args.parseDouble(args, "hillsThresh", 0.1);
+		minM = Args.parseInteger(args, "minscanlen", 6);
+		maxM = Args.parseInteger(args, "maxscanlen", 14);
+		thresold_hills = Args.parseDouble(args, "hillsthresh", 0.1);
 		
 		
 
@@ -554,32 +554,34 @@ public class SeqUnwinderConfig implements Serializable{
 				"are welcome to redistribute it under certain conditions.  See the MIT license \n"+
 				"for details.\n"+
 				"\n OPTIONS:\n" +
-				" General:\n"+
+				"General:\n"+
 				"\t--out <prefix>: Ouput file prefix. All output will be put into a directory with the prefix name\n" +
-				"\t--threads <number of threads to use>\n" +
+				"\t--threads <n>: Use n threads to train SeqUnwinder model. Default is 5 threads\n" +
 				"\t--debug: Flag to run in debug mode; prints extra output\n" +
-				"\t--memepath <path to the meme bin dir (default: meme is in $PATH)>\n" +
-				" Specify the genome:\n" +
+				"\t--memepath <path>: path to the meme bin dir (default: meme is in $PATH)\n" +
+				"Specify the genome:\n" +
 				"\t--geninfo <genome info file> AND --seq <path>: A directory containing fasta format files corresponding to every named chromosome is required\n" +
-				" Input Genomic Regions:\n" +
-				"\t--GenRegs <List of TF binding sites with annotations; eg: chr1:151736000  Shared;Proximal> OR" +
-				"\t--GenSeqs <DNA sequences around at TF binding sites; eg: ATGC...TGC	Shared;Proximal>\n"+
+				"Input Genomic Regions:\n" +
+				"\t--genregs <List of TF binding sites with annotations; eg: chr1:151736000  Shared;Proximal> OR" +
+				"\t--genseqs <DNA sequences around at TF binding sites; eg: ATGC...TGC	Shared;Proximal>\n"+
 				"\t--win <int>: Size of the genomic regions in bp. Default = 150.\n" +
 				"\t--makerandregs: Flag to make random genomic regions as an extra outgroup class in classification (Only applicable when genome is provide.) \n" +
-				" SeqUnwinder modelling options \n" +
-				"\t--minK <int>: Minimum length of k-mer (default = 4)\n" + 
-				"\t--maxK <int>: Maximum length of k-mer (default = 5)>\n" + 
-				"\t--R <value>: Regularization constant (default = 10)>\n" +
-				"\t--X <int>: Number of folds for cross validation, default = 3.\n" +
-				"\t--mergeLow: Flag to merge subclasses with less than 200 sites with other relevant classes. By default, all subclasses with less that 200 sites are removed. \n" +
+				"SeqUnwinder modelling options \n" +
+				"\t--mink <int>: Minimum length of k-mer (default = 4)\n" + 
+				"\t--maxk <int>: Maximum length of k-mer (default = 5)>\n" + 
+				"\t--r <value>: Regularization constant (default = 10)>\n" +
+				"\t--x <int>: Number of folds for cross validation, default = 3.\n" +
+				"\t--mergelow: Flag to merge subclasses with less than 200 sites with other relevant classes. By default, all subclasses with less that 200 sites are removed. \n" +
 				"Other SeqUnwinder options (Highly recommend using defaul options): \n"+
-				"\t--minScanLen <value>: Minimum length of the window to scan K-mer models. Default=8.\n"+
-				"\t--maxScanLen <value>: Maximum length of the window to scan K-mer models. Default=14.\n"+
-				"\t--hillsThresh <value>: Scoring threshold to identify hills. Default=0.1.\n"+
+				"\t--minscanlen <value>: Minimum length of the window to scan K-mer models. Default=8.\n"+
+				"\t--maxscanlen <value>: Maximum length of the window to scan K-mer models. Default=14.\n"+
+				"\t--hillsthresh <value>: Scoring threshold to identify hills. Default=0.1.\n"+
 				"\t--mememinw <value>: minw arg for MEME. Default=6.\n"+
-				"\t--mememaxw <value>: maxw arg for MEME. Default=13. This value should always be less than \"maxScanLen\".\n"+
-				"\t--memeSearchWin <value>: Window around hills to search for discriminative motifs. Default=16.\n"+
-				"\t--A <int>: Maximum number of allowed ADMM iterations. Default=500.\n"+
+				"\t--mememaxw <value>: maxw arg for MEME. Default=13. This value should always be less than \"maxscanlen\".\n"+
+				"\t‒‒memenmotifs <int>: Number of motifs MEME should find in each condition (default=3)" +
+				"\t‒‒memeargs <args> : Additional args for MEME (default:  -dna -mod zoops -revcomp -nostatus)."+
+				"\t--memesearchwin <value>: Window around hills to search for discriminative motifs. Default=16. (Only applicable when run with \"genregs\").\n"+
+				"\t--a <int>: Maximum number of allowed ADMM iterations. Default=500.\n"+
 				""));
 	}
 
