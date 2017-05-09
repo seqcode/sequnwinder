@@ -568,8 +568,8 @@ public class SeqUnwinderConfig implements Serializable{
 				"\t--makerandregs: Flag to make random genomic regions as an extra outgroup class in classification (Only applicable when genome is provide.) \n" +
 				"SeqUnwinder modelling options \n" +
 				"\t--mink <int>: Minimum length of k-mer (default = 4)\n" + 
-				"\t--maxk <int>: Maximum length of k-mer (default = 5)>\n" + 
-				"\t--r <value>: Regularization constant (default = 10)>\n" +
+				"\t--maxk <int>: Maximum length of k-mer (default = 5)\n" + 
+				"\t--r <value>: Regularization constant (default = 10)\n" +
 				"\t--x <int>: Number of folds for cross validation, default = 3.\n" +
 				"\t--mergelow: Flag to merge subclasses with less than 200 sites with other relevant classes. By default, all subclasses with less that 200 sites are removed. \n" +
 				"Other SeqUnwinder options (Highly recommend using defaul options): \n"+
