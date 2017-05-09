@@ -20,7 +20,7 @@ Dependencies:
 
 Citation:
 --------------
-Kakumanu, Akshay, et al. "Characterizing regulatory sequence features that discriminate between overlapping annotation labels." bioRxiv (2017): 100511.
+Kakumanu, Akshay, et al. "Deconvolving sequence features that discriminate between overlapping regulatory annotations." bioRxiv (2017): [100511](http://biorxiv.org/content/early/2017/01/15/100511).
 
 Running SeqUnwinder
 --------------
