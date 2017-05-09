@@ -99,7 +99,7 @@ This example runs SeqUnwinder v0.1.2 on simulated dataset used in the SeqUnwinde
 
 Command:
 ```{r, engine='sh', count_lines}
-java -Xmx20G -jar sequnwinder.jar --out simulateOverlap_sequnwinder_04212017 --threads 10 --debug --memepath path-to-meme --geninfo mm10.info --seq path-to-genomes/mm10/ --GenSeqs simulateOverlap.seqs --win 150 --minK 4 --maxK 5 --R 10 --X 3 --maxScanLen 15
+java -Xmx20G -jar sequnwinder.jar --out simulateOverlap_sequnwinder_04212017 --threads 10 --debug --memepath path-to-meme --geninfo mm10.info --seq path-to-genomes/mm10/ --genseqs simulateOverlap.seqs --win 150 --mink 4 --maxk 5 --r 10 --x 3 --maxscanlen 15
 ```
 
 Results can be found [here](http://lugh.bmb.psu.edu/software/sequnwinder/example/SeqUnwinder_results.html)
