@@ -112,5 +112,5 @@ For queries, please contact Akshay (auk262@psu.edu) or Shaun Mahony (mahony@psu.
 Major History:
 --------------  
 
-Version 0.1.2 (2017-05-08):
+Version 0.1.2 (2017-05-08): Several minor updates over the previous version. SeqUnwinder now automatically estimates "k" for k-means clustering of hills. Additional option provided to deal with sub-classes with very few training instances (see --mergelow). Several options names have been reformatted for consistency.
 Version 0.1 (2016-12-09): Initial release to support manuscript submission.
