@@ -95,7 +95,7 @@ Options (Required/important options are in __bold__.)
 
 Example
 --------------
-This example runs SeqUnwinder v0.1.2 on simulated dataset used in the SeqUnwinder manuscript (Figure 2B, right panel). Simulated sequences to run this example can be found [here](http://lugh.bmb.psu.edu/software/sequnwinder/simulateOverlap.seqs).
+This example runs SeqUnwinder v0.1.2 on simulated dataset. Simulated sequences to run this example can be found [here](http://lugh.bmb.psu.edu/software/sequnwinder/simulateOverlap.seqs).
 
 Command:
 ```{r, engine='sh', count_lines}
