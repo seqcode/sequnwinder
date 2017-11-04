@@ -8,7 +8,6 @@
   <property name="build.dist.dir" location="${build.dir}/dist" />
   <property name="build.unjar.dir" location="${build.dir}/unjar" />
   <property name="build.compiler" value="javac1.8"/>
-  <property name="pwfiles.basepath"  value="/Users/akshaykakumanu/code"/>
   <property name="seqcode-core.classes.dir"  value="../seqcode-core/build/classes"/>
   <property name="seqcode-core.lib.dir"  value="../seqcode-core/lib"/>
   <property name="seqcode-core.unjar.dir"  value="../seqcode-core/build/unjar"/>
@@ -112,18 +111,19 @@
   <target name="requirepwset">
     <fail unless="pwset"
 	  message="Must set pwset property.  This is a subdir of
-		   pwfiles.basepath (${pwfiles.basepath})."/>
+		   pwbasepath (${pwbasepath})."/>
   </target>
 
   <target name="setpwfilespath" depends="init, requirepwset" unless="${pwfiles.path}">
-    <property name="pwfiles.path" value="${pwfiles.basepath}/${pwset}"/>
+    <property name="pwfiles.path" value="${pwbasepath}/${pwset}"/>
   </target>
 
   	<!-- ======================================================================= -->
 	<!-- Target: makesequnwinderjar                                                  -->
 	<!-- Depends: build, unjarall, setpwfilespath                         		 -->
 	<!-- Description: Compiles all the client source files and builds the jar    -->
-	<!--              for SeqUnwinder. ant -Dpwset=public makesequnwinderjar     -->
+	<!--              for SeqUnwinder.                                           -->
+	<!--   ant -Dpwbasepath=/gpfs/group/sam77/default/code/pwfiles  -Dpwset=public makesequnwinderjar     -->
 	<!-- ======================================================================= -->
   <target name="makesequnwinderjar" depends="build, unjarall, setpwfilespath">
     <delete dir="${build.unjar.dir}/META-INF"/>
