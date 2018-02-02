@@ -25,11 +25,9 @@ import org.seqcode.genome.location.Region;
 import org.seqcode.genome.location.RepeatMaskedRegion;
 import org.seqcode.genome.sequence.SequenceGenerator;
 import org.seqcode.gsebricks.verbs.location.ChromRegionIterator;
-import org.seqcode.gsebricks.verbs.location.ChromosomeGenerator;
 import org.seqcode.gsebricks.verbs.location.RepeatMaskedGenerator;
 import org.seqcode.gseutils.ArgParser;
 import org.seqcode.gseutils.Args;
-import org.seqcode.gseutils.Pair;
 
 
 /**
@@ -121,6 +119,8 @@ public class SeqUnwinderConfig implements Serializable{
 	public static final int NUM_HILLS = 750;
 	/** No of iterations of clustering */
 	public static final int ITRS_CLUS=10;
+	/** minimum ROC required to report motif*/
+	protected double motifMinROC=0.7;
 	
 	// Meme parameters
 	protected String MEMEpath;
@@ -193,6 +193,7 @@ public class SeqUnwinderConfig implements Serializable{
 	public int getMemeSearchWin(){return MEMEwin;}
 	public int getMinM(){return minM;}
 	public int getMaxM(){return maxM;}
+	public double getMotifMinROC(){return motifMinROC;}
 	public int getKmerBaseInd(String kmer){
 		int baseInd = 0;
 		for(int k=minK; k<kmer.length(); k++){
@@ -413,6 +414,8 @@ public class SeqUnwinderConfig implements Serializable{
 		//Size of the focussed meme search win
 		MEMEwin = Args.parseInteger(args, "memesearchwin", 16);
 		MEMEnmotifs = Args.parseInteger(args, "memenmotifs", 3);
+		//Minimum ROC to report motifs
+		motifMinROC =  Args.parseDouble(args, "motifminROC", 0.7);
 
 		// Load arguments for Discrim analysis
 		minM = Args.parseInteger(args, "minscanlen", 6);
@@ -584,6 +587,7 @@ public class SeqUnwinderConfig implements Serializable{
 				"\t--memenmotifs <int>: Number of motifs MEME should find in each condition (default=3)\n" +
 				"\t--memeargs <args> : Additional args for MEME (default:  -dna -mod zoops -revcomp -nostatus)\n"+
 				"\t--memesearchwin <value>: Window around hills to search for discriminative motifs. Default=16. (Only applicable when run with \"genregs\").\n"+
+				"\t--motifminROC <value>: minimum class-specific ROC required to report motif. Default=0.7." +
 				"\t--a <int>: Maximum number of allowed ADMM iterations. Default=400.\n"+
 				""));
 	}

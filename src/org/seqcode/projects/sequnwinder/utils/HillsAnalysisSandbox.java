@@ -310,7 +310,7 @@ public class HillsAnalysisSandbox {
 					if(fm.get(w)!=null){
 						System.err.println("\t"+fm.get(w).getName()+"\t"+ WeightMatrix.getConsensus(fm.get(w))+"\tROC:"+String.format("%.2f",rocScores[w]));
 					}
-					if(rocScores[w] > MemeER.MOTIF_MIN_ROC){
+					if(rocScores[w] > meme.getMotifMinROC()){
 						//selectedMotifs.add(fm.get(w));
 						fm.get(w).setName(modName+"_c"+Integer.toString(c)+"_"+Integer.toString(motInd));
 						discrimMotifs.add(fm.get(w));

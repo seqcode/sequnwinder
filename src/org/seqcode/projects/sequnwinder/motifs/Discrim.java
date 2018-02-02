@@ -138,6 +138,7 @@ public class Discrim {
 				// Now do meme search on each clusters separately
 				String memeargs = seqConfig.getMemeArgs();
 				MemeER meme = new MemeER(seqConfig.getMemePath(), memeargs);
+				meme.setMotifMinROC(seqConfig.getMotifMinROC());
 				for(int c=0; c<bestNumClusters; c++){ // Over each cluster
 					System.err.println("Loading sequences for meme analysis : "+kmerModelName+ "Cluster"+c);
 					int numHillsLoaded = 0;
@@ -172,7 +173,7 @@ public class Discrim {
 							if(fm.get(w)!=null){
 								System.err.println("\t"+fm.get(w).getName()+"\t"+ WeightMatrix.getConsensus(fm.get(w))+"\tROC:"+String.format("%.2f",rocScores[w]));
 							}
-							if(rocScores[w] > MemeER.MOTIF_MIN_ROC){
+							if(rocScores[w] > meme.getMotifMinROC()){
 								//selectedMotifs.add(fm.get(w));
 								fm.get(w).setName(kmerModelName+"_c"+Integer.toString(c)+"_"+Integer.toString(motInd));
 								discrimMotifs.add(fm.get(w));
