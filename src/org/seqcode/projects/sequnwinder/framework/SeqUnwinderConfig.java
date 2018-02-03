@@ -544,8 +544,8 @@ public class SeqUnwinderConfig implements Serializable{
 		outdir.mkdirs();
 		
 		// Make the intermediate directory
-		File interDir = new File(outdir.getAbsoluteFile()+File.separator+"intermediate");
-		interDir.mkdirs();
+		//File interDir = new File(outdir.getAbsoluteFile()+File.separator+"intermediate");
+		//interDir.mkdirs();
 
 	}
 
