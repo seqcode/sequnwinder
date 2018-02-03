@@ -42,7 +42,7 @@ public class SeqUnwinderConfig implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public static String version = "0.1.2";
+	public static String version = "0.1.3";
 	
 	// General options
 	protected GenomeConfig gcon;
