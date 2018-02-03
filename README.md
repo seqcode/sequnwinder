@@ -112,6 +112,8 @@ For queries, please contact Akshay (auk262@psu.edu) or Shaun Mahony (mahony@psu.
 Major History:
 --------------  
 
+Version 0.1.3 (2018-02-03): Fixing an issue with the discriminative performance evaluation of MEME-derived interpretable motifs. The effect of this issue was that some discriminative motifs would not have been reported to the user in the final SeqUnwinder results.   
+
 Version 0.1.2 (2017-05-08): Several minor updates over the previous version. SeqUnwinder now automatically estimates "k" for k-means clustering of hills. Additional option provided to deal with sub-classes with very few training instances (see --mergelow). Several option names have been reformatted for consistency.
 
 Version 0.1 (2016-12-09): Initial release to support manuscript submission.
