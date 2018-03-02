@@ -3,7 +3,6 @@ package org.seqcode.projects.sequnwinder.motifs;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -59,7 +58,7 @@ public class Discrim {
 	}
 
 	
-	//Slave methods
+	//Make MEME output directories
 	public void makeMemeDirs(){
 		for(String s : seqConfig.getMNames()){
 			if(!s.equals("Random")){

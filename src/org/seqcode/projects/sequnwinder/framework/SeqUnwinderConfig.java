@@ -315,7 +315,7 @@ public class SeqUnwinderConfig implements Serializable{
 					while (repItr.hasNext()) {
 						RepeatMaskedRegion currRep = repItr.next();
 						if (currRep.overlaps(currRegion)) {
-							repLen += (double) currRep.getWidth();
+							repLen += (double) currRep.getOverlapSize(currRegion);
 						}
 					}
 					if (repLen / (double) currRegion.getWidth() > repPropLimit){
@@ -671,7 +671,7 @@ public class SeqUnwinderConfig implements Serializable{
 								while (repItr.hasNext()) {
 									RepeatMaskedRegion currRep = repItr.next();
 									if (currRep.overlaps(potential)) {
-										repLen += (double) currRep.getWidth();
+										repLen += (double) currRep.getOverlapSize(potential);
 									}
 								}
 								if (repLen / (double) potential.getWidth() > repPropLimit)
