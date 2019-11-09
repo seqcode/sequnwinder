@@ -65,7 +65,7 @@ public class Outputwriter {
 		}
 	}
 
-	public void writeClssifierOutput() throws IOException{
+	public void writeClassifierOutput() throws IOException{
 		File classifierOutFile = new File(seqConfig.getOutDir().getAbsolutePath()+File.separator+"classifier.out");
 		FileWriter fw = new FileWriter(classifierOutFile);
 		BufferedWriter bw= new BufferedWriter(fw);

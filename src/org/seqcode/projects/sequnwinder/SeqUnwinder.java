@@ -98,7 +98,7 @@ public class SeqUnwinder {
 		sequnwinder.getConfig().setTrainSetStats(trainStats);
 		sequnwinder.getConfig().setTestSetStats(testStats);
 		
-		scribe.writeClssifierOutput();
+		scribe.writeClassifierOutput();
 		
 		System.err.println("Converting K-mer models into class-discriminative motifs ..." );
 
@@ -117,6 +117,9 @@ public class SeqUnwinder {
 		scribe.makeDiscrimJavaHeatmaps();
 		// Finally, make a html file for output
 		scribe.writeHTMLfile();
+		
+		//Tidy (deletes intermediate directory)
+		sequnwinder.getConfig().close();
 		
 		System.err.println("Finished running SeqUnwinder...");
 		

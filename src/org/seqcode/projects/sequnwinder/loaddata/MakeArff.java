@@ -113,7 +113,7 @@ public class MakeArff {
 		
 		if(snamesToChange.size()>0){
 			for(String sToChange : snamesToChange){
-				String modified = sToChange.concat("OnLy#").concat(sToChange);
+				String modified = sToChange.concat("only#").concat(sToChange);
 				subGroupNames.remove(sToChange);
 				subGroupNames.add(modified);
 				for(int s=0; s< subGroupsAtPeaks.size(); s++){

@@ -113,6 +113,7 @@ public class SeqUnwinderConfig implements Serializable{
 	protected String outbase;
 	/** The output directory file */
 	protected File outdir;
+	protected File interdir;
 	/** The minimum value of model scan score to consider form motif finding */
 	protected double thresold_hills = 0.1;
 	/** The number of hills in each cluster to consider for MEME motif finding */
@@ -186,6 +187,7 @@ public class SeqUnwinderConfig implements Serializable{
 	public HashMap<String,double[]> getKmerWeights(){return kmerweights;}
 	public File getOutDir(){return outdir;}
 	public String getOutbase(){return outbase;}
+	public File getInterDir(){return interdir;}
 	public List<String> getSubGroupNames(){return kmerSubGroupNames;}
 	public List<String> getMNames(){return modelNames;}
 	public String getMemeArgs(){String memeargs = MEMEargs+" -nmotifs "+MEMEnmotifs + " -minw "+MEMEminw+" -maxw "+MEMEmaxw; return memeargs;}
@@ -544,8 +546,8 @@ public class SeqUnwinderConfig implements Serializable{
 		outdir.mkdirs();
 		
 		// Make the intermediate directory
-		//File interDir = new File(outdir.getAbsoluteFile()+File.separator+"intermediate");
-		//interDir.mkdirs();
+		interdir = new File(outdir.getAbsoluteFile()+File.separator+"intermediate");
+		interdir.mkdirs();
 
 	}
 
@@ -606,6 +608,10 @@ public class SeqUnwinderConfig implements Serializable{
 			}
 		}
 		return( path.delete() );
+	}
+	
+	public void close(){
+		deleteDirectory(interdir);
 	}
 
 	public class RandRegionsGenerator{

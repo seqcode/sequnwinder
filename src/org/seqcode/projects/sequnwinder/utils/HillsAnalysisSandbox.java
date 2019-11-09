@@ -45,6 +45,7 @@ public class HillsAnalysisSandbox {
 	int numClusterItrs = 10;
 	// Meme parameters
 	protected String MEMEpath;
+	protected File MEMEwd=null;
 	protected String MEMEargs = " -dna -mod zoops -revcomp -nostatus ";
 	protected int MEMEminw = 6;
 	protected int MEMEmaxw = 11;
@@ -67,6 +68,7 @@ public class HillsAnalysisSandbox {
 	
 	//Settors
 	public void setMEMEpath(String s){MEMEpath = s;}
+	public void setMEMEworkingdir(File f){MEMEwd = f;}
 	public void setMEMEminw(int w){MEMEminw = w;}
 	public void setMEMEmaxw(int w){MEMEmaxw = w;}
 	public void setMEMEnmotifs(int n){MEMEnmotifs = n;}
@@ -276,6 +278,7 @@ public class HillsAnalysisSandbox {
 		// Now do meme search on each clusters separately
 		String memeargs = getMemeArgs();
 		MemeER meme = new MemeER(MEMEpath, memeargs);
+		meme.setWorkingDir(MEMEwd);
 		for(int c=0; c<clusterManager.getNumClusters(); c++){ // Over each cluster
 			System.err.println("Loading sequences for meme analysis : "+modName+ "Cluster"+c);
 			int numHillsLoaded = 0;
@@ -613,6 +616,8 @@ public class HillsAnalysisSandbox {
 			// Path to MEME binary
 			String memepath = Args.parseString(args, "memepath", "");
 			runner.setMEMEpath(memepath);
+			String memewd = Args.parseString(args, "memewd", "");
+			runner.setMEMEworkingdir(new File(memewd));
 			int mememinw = Args.parseInteger(args, "mememinw", 6);
 			runner.setMEMEminw(mememinw);
 			int mememaxw = Args.parseInteger(args, "mememaxw", 11);

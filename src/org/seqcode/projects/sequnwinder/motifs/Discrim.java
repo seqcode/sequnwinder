@@ -137,6 +137,7 @@ public class Discrim {
 				// Now do meme search on each clusters separately
 				String memeargs = seqConfig.getMemeArgs();
 				MemeER meme = new MemeER(seqConfig.getMemePath(), memeargs);
+				meme.setWorkingDir(seqConfig.getInterDir());
 				meme.setMotifMinROC(seqConfig.getMotifMinROC());
 				for(int c=0; c<bestNumClusters; c++){ // Over each cluster
 					System.err.println("Loading sequences for meme analysis : "+kmerModelName+ "Cluster"+c);
