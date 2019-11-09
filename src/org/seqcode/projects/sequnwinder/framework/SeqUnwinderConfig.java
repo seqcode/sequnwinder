@@ -707,9 +707,7 @@ public class SeqUnwinderConfig implements Serializable{
 							if (regionOK) {
 								validSamples++;
 								regList.add(potential);
-								System.out.println(potential.getChrom() + ":"
-										+ potential.getStart() + "-"
-										+ potential.getEnd());
+								//System.out.println(potential.getChrom() + ":" + potential.getStart() + "-" + potential.getEnd());
 							}
 						}
 					}

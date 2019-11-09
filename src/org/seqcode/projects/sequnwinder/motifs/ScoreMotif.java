@@ -32,7 +32,7 @@ public class ScoreMotif {
 			scores.put(wm.getName(), new double[seqConfig.getMNames().size()]);
 		}
 		// Write the motif associated k-mers to a file
-		FileWriter fw = new FileWriter(new File(seqConfig.getOutDir().getAbsolutePath()+File.separator+"kmer_at_motigs.tab"));
+		FileWriter fw = new FileWriter(new File(seqConfig.getOutDir().getAbsolutePath()+File.separator+"kmer_at_motifs.tab"));
 		BufferedWriter bw = new BufferedWriter(fw);
 		StringBuilder sb = new StringBuilder();
 		sb.append("#Kmers used to to score motifs"); sb.append("\n");
