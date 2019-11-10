@@ -49,18 +49,21 @@ public class MakeArff {
 	 */
 	@SuppressWarnings("unchecked")
 	public void setLabels(){
-		//HashMap<String,Integer> subgroupNames = new HashMap<String,Integer>();
 		HashMap<String,Integer> labelNames = new HashMap<String,Integer>();
+		HashMap<String,Integer> subgroupNamesHash = new HashMap<String,Integer>();
 		for(String s : seqConfig.getPeakAnnotations()){
 			String[] labels = s.split(";");
 			// Now generate the sub group name
 			StringBuilder subgroupSB = new StringBuilder();
-			for(int i=0; i<labels.length-1; i++){
-				subgroupSB.append(labels[i]);subgroupSB.append("#");
+			for(String sname : labels){
+				subgroupSB.append(sname);subgroupSB.append("#");
 			}
-			subgroupSB.append(labels[labels.length-1]);
+			subgroupSB.deleteCharAt(subgroupSB.length()-1);
 			String subgroup = subgroupSB.toString();
-			subGroupNames.add(subgroup);
+			if(!subgroupNamesHash.containsKey(subgroup)){
+				subgroupNamesHash.put(subgroup, 1);
+				subGroupNames.add(subgroup);
+			}
 			for(String sname : labels){
 				if(!labelNames.containsKey(sname)){
 					labelNames.put(sname, 1);
