@@ -27,7 +27,7 @@ public class MakeArff {
 	/** Weight for each subgroup; estimated based on number of training instances for each subgroup in the training dataset */
 	protected HashMap<String,Double> subGroupWeights = new HashMap<String,Double>();
 	/** All the subgroup names*/
-	protected LinkedHashSet<String> subGroupNames = new LinkedHashSet<String>();
+	protected List<String> subGroupNames = new ArrayList<String>();
 	/** subgroup annotations at each each; stored into a list*/
 	protected List<String> subGroupsAtPeaks = new ArrayList<String>();
 
@@ -55,10 +55,10 @@ public class MakeArff {
 			String[] labels = s.split(";");
 			// Now generate the sub group name
 			StringBuilder subgroupSB = new StringBuilder();
-			for(String sname : labels){
-				subgroupSB.append(sname);subgroupSB.append("#");
+			for(int i=0; i<labels.length-1; i++){
+				subgroupSB.append(labels[i]);subgroupSB.append("#");
 			}
-			subgroupSB.deleteCharAt(subgroupSB.length()-1);
+			subgroupSB.append(labels[labels.length-1]);
 			String subgroup = subgroupSB.toString();
 			subGroupNames.add(subgroup);
 			for(String sname : labels){
@@ -102,22 +102,19 @@ public class MakeArff {
 		// sname ==> snameOnLy#sname 
 		// change in "subGroupsAtPeaks" also
 		// And also reset the annotaions in Config. Keep ";" instead of "#"
-		List<String> snamesToChange = new ArrayList<String>();
-		for(String sname : subGroupNames){
+		for(int i=0; i<subGroupNames.size(); i++){
+			String sname = subGroupNames.get(i);
+			boolean changeName =false;
 			for(String l : labelNames.keySet()){
 				if(sname.equals(l)){
-					snamesToChange.add(sname);
+					changeName=true;
 				}
 			}
-		}
-		
-		if(snamesToChange.size()>0){
-			for(String sToChange : snamesToChange){
-				String modified = sToChange.concat("only#").concat(sToChange);
-				subGroupNames.remove(sToChange);
-				subGroupNames.add(modified);
+			if(changeName){
+				String modified = sname.concat("Only#").concat(sname);
+				subGroupNames.set(i, modified);
 				for(int s=0; s< subGroupsAtPeaks.size(); s++){
-					if(subGroupsAtPeaks.get(s).equals(sToChange)){
+					if(subGroupsAtPeaks.get(s).equals(sname)){
 						subGroupsAtPeaks.set(s, modified);
 					}
 				}

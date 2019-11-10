@@ -136,7 +136,7 @@ public class SeqUnwinderConfig implements Serializable{
 	/** Model names **/
 	protected List<String> modelNames = new ArrayList<String>();
 	/** SubGroup names */
-	protected List<String> kmerSubGroupNames = new ArrayList<String>();
+	protected List<String> kmerSubGroupNames;
 	/** Stores the weights of the K-mers
 	 *  Keys are the model name
 	 * 	Values are the K-mers weights for a given model */ 
@@ -150,7 +150,7 @@ public class SeqUnwinderConfig implements Serializable{
 	
 	//Settors
 	public void resetPeakAnnotations(List<String> modifiedAnnotations){annotations.clear();annotations.addAll(modifiedAnnotations);}
-	public void setSubGroupNames(LinkedHashSet<String> sGNs){kmerSubGroupNames.addAll(sGNs);}
+	public void setSubGroupNames(List<String> sGNs){kmerSubGroupNames = new ArrayList<String>(); kmerSubGroupNames.addAll(sGNs);}
 	public void setModelNames(List<String> modNames){modelNames.addAll(modNames);}
 	public void setNumLayers(int n){
 		sm_NumLayers = n;
@@ -446,7 +446,7 @@ public class SeqUnwinderConfig implements Serializable{
 
 		for(String sname :  subclassCount.keySet()){
 			if(subclassCount.get(sname)<minSubClassSizeNotify){
-				System.err.println("Wrarning!! -->	"+sname+" has less than "+ Integer.toString(minSubClassSizeNotify)+
+				System.err.println("Warning!! -->	"+sname+" has less than "+ Integer.toString(minSubClassSizeNotify)+
 						" sites. Removing this subgroup. Use mergeLow option to merge these sites." );
 				sgroupsToRemove.add(sname);
 			}
