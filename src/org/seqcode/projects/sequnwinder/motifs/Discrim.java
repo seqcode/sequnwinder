@@ -256,7 +256,8 @@ public class Discrim {
 		 */
 		public void clusterKmerProfilesAtMountains() throws IOException{
 			fillHills();
-			System.err.println("No of hills for K-mer model "+kmerModelName+" are :"+(seqConfig.getRegions().size() > 0 ? posHills.size() : posHillsSeqs.size()));
+			System.err.println("No of regions for K-mer model "+kmerModelName+" : "+(seqConfig.getRegions().size() > 0 ? modelRegions.size() : modelSeqs.size()));
+			System.err.println("No of hills for K-mer model "+kmerModelName+" : "+(seqConfig.getRegions().size() > 0 ? posHills.size() : posHillsSeqs.size()));
 			if(posHills.size() > 100 || posHillsSeqs.size() > 100){
 				ClusterProfiles clusterManager = new ClusterProfiles(SeqUnwinderConfig.ITRS_CLUS,profiles,posHillsToIndex,seqConfig.getKmin(),seqConfig.getKmax(),posHillScores,basedir_profiles);
 				clusterAssignment = clusterManager.execute();
