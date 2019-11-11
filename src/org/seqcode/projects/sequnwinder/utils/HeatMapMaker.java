@@ -241,7 +241,7 @@ public class HeatMapMaker extends AbstractPaintable {
 			}
 		}
 		// draw the legend
-		drawExpColorBar(g2d,xPos-60,topBound+BoxHeight*(2+matrix.keySet().size()));
+		drawExpColorBar(g2d,xPos-60,topBound+(BoxHeight*(2+rownames.size())));
 
 	}
 
