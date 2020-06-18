@@ -1,3 +1,9 @@
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/sequnwinder/badges/installer/conda.svg)](https://anaconda.org/bioconda/sequnwinder) 
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/sequnwinder/badges/downloads.svg)](https://anaconda.org/bioconda/sequnwinder)
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/sequnwinder/badges/platforms.svg
+)](https://anaconda.org/bioconda/sequnwinder)
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/sequnwinder/badges/license.svg)](https://anaconda.org/bioconda/sequnwinder)
+
 # SeqUnwinder
 
 SeqUnwinder is a framework for characterizing class-discriminative motifs in a collection of genomic loci that have several (overlapping) annotation labels.  
