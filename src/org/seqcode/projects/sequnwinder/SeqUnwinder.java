@@ -24,7 +24,6 @@ public class SeqUnwinder {
 	
 	public static void main(String[] args) throws Exception{
 		
-		System.err.println("SeqUnwinder version "+SeqUnwinderConfig.version+"\n\n");
 		SeqUnwinderConfig seqCon = new SeqUnwinderConfig(args);
 		SeqUnwinder sequnwinder = new SeqUnwinder(seqCon);
 		Outputwriter scribe = new Outputwriter(seqCon);
