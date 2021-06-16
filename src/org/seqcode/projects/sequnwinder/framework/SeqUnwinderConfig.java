@@ -226,8 +226,9 @@ public class SeqUnwinderConfig implements Serializable{
 		if(ap.hasKey("h") || ap.hasKey("help") || args.length == 0){
 			System.err.println(SeqUnwinderConfig.getSeqUnwinderArgsList());
 			System.exit(1);
-		}else if(ap.hasKey("v") || ap.hasKey("version")){
-			System.out.println("SeqUnwinder version "+SeqUnwinderConfig.version+"\n\n");
+		}
+		if(ap.hasKey("v") || ap.hasKey("version")){
+			System.out.println("SeqUnwinder version "+SeqUnwinderConfig.version);
 			System.exit(1);
 		}
 		System.err.println("SeqUnwinder version "+SeqUnwinderConfig.version+"\n\n");
