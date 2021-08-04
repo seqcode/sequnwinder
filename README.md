@@ -84,7 +84,8 @@ Options (Required/important options are in __bold__.)
      For most SeqUnwinder analysis described in the manuscript, *K*-mers of lengths 4 and 5 showed optimal performance. However, with larger datasets (with more data instances for training), maxk can be increased to 6 or 7. 
   * --r \<value\>: Regularization co-efficient in the model. For most SeqUnwinder applications, with ~20k genomic sites and ~6 labels and *K*-mers of 4 and 5, a value of 10.0 has been very effective. However, the optimal value could change with datasets. One might want to use a range of values and choose the one that performs best (in terms of test accuracy).
   * --x \<int\>: Number of folds for cross validation. Default = 3.
-  * --mergelow: Flag to merge subclasses with fewer than 200 sites with other relevant classes. By default, all subclasses with less than 200 sites are removed.
+  * --minsubclass \<int\>: Minimum number of sites needed to consistitute a subclass. Default = 200. 
+  * --mergelow: Flag to merge subclasses with fewer than "minsubclass" sites with other relevant classes. By default, all subclasses with less than 200 sites are removed.
   
 5. Other SeqUnwinder options (Highly recommend using defaul options):
 
@@ -117,6 +118,8 @@ For queries, please contact Akshay (auk262@psu.edu) or Shaun Mahony (mahony@psu.
 
 Major History:
 --------------  
+
+Version 0.1.5 (2021-08-03): Fixing bug in --genseqs sequence loading. Also added --minsubclass option. 
 
 Version 0.1.4 (2020-10-29): Fixing problems with mislabeling in the motif heatmap in the final report. 
 
