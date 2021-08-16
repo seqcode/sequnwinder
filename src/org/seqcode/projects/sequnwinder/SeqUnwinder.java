@@ -121,6 +121,7 @@ public class SeqUnwinder {
 		sequnwinder.getConfig().close();
 		
 		System.err.println("Finished running SeqUnwinder...");
+		System.exit(0);
 		
 	}
 
