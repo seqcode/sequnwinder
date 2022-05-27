@@ -336,7 +336,7 @@ public class SeqUnwinderConfig implements Serializable{
 			}
 		}		
 
-		//Minimum number of sites to consitute a subclass
+		//Minimum number of sites to constitute a subclass
 		minSubClassSize = Args.parseInteger(args, "minsubclass", 200);
 		
 		//Check if any subclasses have less the minimum number of allowed training instances
@@ -585,7 +585,7 @@ public class SeqUnwinderConfig implements Serializable{
 				"\t--maxk <int>: Maximum length of k-mer (default = 5)\n" + 
 				"\t--r <value>: Regularization constant (default = 10)\n" +
 				"\t--x <int>: Number of folds for cross validation, default = 3.\n" +
-				"\t--minsubclass <int>: minimum number of sites to make a subclass"+
+				"\t--minsubclass <int>: minimum number of sites to make a subclass\n"+
 				"\t--mergelow: Flag to merge subclasses with less than \"minsubclass\" sites with other relevant classes. By default, all subclasses with less that 200 sites are removed. \n" +
 				" Other SeqUnwinder options (Highly recommend using defaul options): \n"+
 				"\t--minscanlen <value>: Minimum length of the window to scan K-mer models. Default=8.\n"+
